@@ -200,7 +200,7 @@ h2 {
 
 .video-container {
     position: relative;
-    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio -- if you are reading this, you are cute UwU */
     height: 0;
     overflow: hidden;
     max-width: 100%;
