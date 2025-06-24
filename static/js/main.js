@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Stop the YouTube video from playing in the background after the animation
         setTimeout(() => {
             modalYoutubeIframe.src = '';
-        }, 400); // This duration should match the CSS transition time
+        }, 400); // This duration should match the CSS transition time :O
     }
 
     // Event listeners for closing the modal
