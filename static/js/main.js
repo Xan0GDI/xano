@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize AOS library for scroll animations for cutie
+    // Initialize AOS library for scroll animations
     AOS.init({
         duration: 800,
         once: true
@@ -78,4 +78,38 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('keydown', (event) => {
         if (event.key === 'Escape' && modal.classList.contains('show')) closeModal();
     });
+
+    // --- Live Avatar Update Logic ---
+
+    // Function to update Roblox avatar dynamically
+    async function updateRobloxAvatar() {
+        const robloxLink = document.querySelector('.contact-item[data-roblox-id]');
+        if (!robloxLink) return; // Exit if Roblox link not found
+
+        const robloxId = robloxLink.dataset.robloxId;
+        const robloxAvatarImg = robloxLink.querySelector('#roblox-avatar');
+
+        if (!robloxId || !robloxAvatarImg) return; // Exit if ID or image element not found
+
+        const apiUrl = `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${robloxId}&size=48x48&format=Png&isCircular=false`;
+
+        try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+
+            if (data.data && data.data.length > 0 && data.data[0].imageUrl) {
+                robloxAvatarImg.src = data.data[0].imageUrl;
+            } else {
+                console.warn('Roblox avatar not found or API response malformed.');
+            }
+        } catch (error) {
+            console.error('Error fetching Roblox avatar:', error);
+            // Fallback to the static image if there's an error
+            robloxAvatarImg.src = 'static/avatar/roblox.png';
+        }
+    }
+
+    // Call the avatar update function on page load
+    updateRobloxAvatar();
 });
