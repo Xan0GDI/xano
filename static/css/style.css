@@ -110,16 +110,50 @@ h2 {
     padding: 0;
     margin: 0;
     list-style: none;
+    max-width: 50%;
+    min-width: 320px; /* Prevent it from getting too narrow */
 }
 
 .skills li {
-    background: #1f1f22;
-    padding: 10px 20px;
+    background: linear-gradient(145deg, #1a1a1d, #111113);
+    padding: 12px 24px;
     border-radius: 12px;
-    max-width: 200px;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+    cursor: default;
+    position: relative; /* Needed for tooltip positioning */
+    align-self: flex-start; /* Prevent items from stretching to full width */
+}
+
+.skills li:hover {
+    transform: translateX(5px);
+    border-color: rgba(164, 124, 255, 0.5);
+    box-shadow: 0 0 15px rgba(164,124,255,0.2);
+}
+
+/* Tooltip styles */
+.skills li::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 105%;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #1f1f22;
+    color: #ccc;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    z-index: 10;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease 0.1s;
+}
+
+.skills li:hover::after {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .logo {
@@ -127,6 +161,48 @@ h2 {
     height: auto;
     margin-bottom: 20px;
     
+}
+
+/* --- Contact List Styles --- */
+.contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+    align-items: flex-start; /* Align items to the start of the flex container */
+}
+
+.contact-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    background: linear-gradient(145deg, #1a1a1d, #111113);
+    padding: 10px 20px;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #ccc;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    cursor: default;
+    width: fit-content; /* Adjust width to content */
+}
+
+a.contact-item {
+    cursor: pointer;
+}
+
+.contact-item:hover {
+    transform: translateX(5px);
+    color: #fff;
+    border-color: rgba(164, 124, 255, 0.5);
+    box-shadow: 0 0 15px rgba(164,124,255,0.2);
+}
+
+.contact-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 /* --- Modal Styles --- */
@@ -192,21 +268,41 @@ h2 {
     cursor: pointer;
 }
 
+#modalBody {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    flex-wrap: wrap; /* Allows content to stack on smaller screens if needed */
+}
+
 #modalImage {
     max-width: 100%;
     border-radius: 8px;
     margin-bottom: 20px;
 }
 
+#modalDescription {
+    flex: 1;
+    min-width: 250px;
+    margin: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #2a2a2e;
+    color: #ccc;
+    line-height: 1.6;
+}
+
 .video-container {
     position: relative;
-    padding-bottom: 56.25%; /* 16:9 Aspect Ratio -- if you are reading this, you are cute UwU */
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
     height: 0;
     overflow: hidden;
     max-width: 100%;
     background: #000;
-    margin-top: 20px;
     border-radius: 8px;
+    flex: 1.5; /* Give video more space */
+    min-width: 300px;
 }
 
 .video-container iframe {
