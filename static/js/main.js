@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize AOS library for scroll animations
+    // Initialize AOS library for scroll animations for cutie
     AOS.init({
         duration: 800,
         once: true
