@@ -3,7 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xan0 Portfolio</title>
+    <title>Xan0 - Cyber Security & Web Dev Portfolio</title>
+    <link rel="icon" href="static/logo.png" type="image/png">
+
+    <!-- SEO and Embed Meta Tags for sharing on social media -->
+    <meta name="description" content="Explore the portfolio of Xan0, a 17-year-old Cyber Security and Web Development enthusiast. Discover projects in ethical malware research, full-stack web apps, and more.">
+    <meta name="author" content="Xan0">
+    <meta name="theme-color" content="#a47cff">
+
+    <!-- Open Graph (for Discord, Facebook, WhatsApp, etc.) -->
+    <meta property="og:title" content="Xan0 - Cyber Security & Web Dev Portfolio">
+    <meta property="og:description" content="Explore the portfolio of Xan0, a 17-year-old Cyber Security and Web Development enthusiast. Discover projects in ethical malware research, full-stack web apps, and more.">
+    <meta property="og:image" content="static/logo.png"> <!-- Note: For best results, use an absolute URL (e.g., https://your-username.github.io/your-repo/static/logo.png) once deployed. -->
+    <meta property="og:url" content=""> <!-- Note: Fill this with your final website URL once deployed. -->
+    <meta property="og:type" content="website">
+
+    
     <link rel="stylesheet" href="static/css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
 </head>
@@ -70,20 +85,34 @@
         <section id="skills" data-aos="fade-up" data-aos-delay="200">
             <h2>Skills</h2>
             <ul class="skills">
-                <li>Python (Advanced)</li>
-                <li>Kali Linux (Proficient)</li>
-                <li>Client-Side Penetration Testing</li>
-                <li>Cyber Security Fundamentals</li>
-                <li>Social Engineering Principles</li>
-                <li>Full-Stack Web Development</li>
+                <li data-tooltip="Scripting, web development (Flask), and security tool creation.">Python (Advanced)</li>
+                <li data-tooltip="Using Kali Linux tools for penetration testing and security analysis.">Kali Linux (Proficient)</li>
+                <li data-tooltip="Identifying and exploiting vulnerabilities in client-side applications.">Client-Side Penetration Testing</li>
+                <li data-tooltip="Core concepts, threat modeling, risk assessment, and defense.">Cyber Security Fundamentals</li>
+                <li data-tooltip="Using psychological manipulation to obtain confidential information.">Social Engineering Principles</li>
+                <li data-tooltip="Building both front-end (HTML/CSS/JS) and back-end (Python/Flask) applications.">Full-Stack Web Development</li>
             </ul>
         </section>
         <section id="contact" data-aos="fade-up" data-aos-delay="300">
             <h2>Contact</h2>
-            <p>Discord: .xan0.</p>
-            <p>Roblox: L1C_L</p>
-            <p>GitHub: Xan0GDI</p>
-            <p>Youtube: @Xan0V2</p>
+            <div class="contact-list">
+                <div class="contact-item">
+                    <img src="static/avatar/discord.png" alt="Discord Logo">
+                    <span>.xan0.</span>
+                </div>
+                <a href="https://www.roblox.com/users/3770511275/profile" target="_blank" rel="noopener noreferrer" class="contact-item" data-roblox-id="3770511275">
+                    <img src="static/avatar/roblox.png" alt="Roblox Logo" id="roblox-avatar">
+                    <span>L1C_L</span>
+                </a>
+                <a href="https://github.com/Xan0GDI" target="_blank" rel="noopener noreferrer" class="contact-item">
+                    <img src="static/avatar/github.png" alt="GitHub Logo">
+                    <span>Xan0GDI</span>
+                </a>
+                <a href="https://www.youtube.com/@Xan0V2" target="_blank" rel="noopener noreferrer" class="contact-item">
+                    <img src="static/avatar/youtube.png" alt="YouTube Logo">
+                    <span>@Xan0V2</span>
+                </a>
+            </div>
         </section>
     </main>
 
