@@ -131,31 +131,6 @@ h2 {
     box-shadow: 0 0 15px rgba(164,124,255,0.2);
 }
 
-/* Tooltip styles */
-.skills li::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    left: 105%;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: #1f1f22;
-    color: #ccc;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    white-space: nowrap;
-    z-index: 10;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease 0.1s;
-}
-
-.skills li:hover::after {
-    opacity: 1;
-    pointer-events: auto;
-}
-
 .logo {
     width: 200px;
     height: auto;
