@@ -276,7 +276,7 @@ a.contact-item {
     max-width: 100%;
     background: #000;
     border-radius: 8px;
-    flex: 1.5; /* Give video more space */
+    flex: 1.5; /* Give video more space  */
     min-width: 300px;
 }
 
