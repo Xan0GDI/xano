@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xan0 | Full-Stack Developer & Security Enthusiast</title>
+    <link rel="icon" href="logo.png" type="image/png">
+
+    <!-- SEO and Embed Meta Tags for sharing on social media -->
+    <meta name="description" content="The professional portfolio of Xan0, a passionate Full-Stack Developer and Cyber Security enthusiast. Specializing in Python, JavaScript, and secure application development.">
+    <meta name="author" content="Xan0">
+    <meta name="theme-color" content="#a47cff">
+
+    <!-- Open Graph (for Discord, Facebook, WhatsApp, etc.) -->
+    <meta property="og:title" content="Xan0 | Full-Stack Developer & Security Enthusiast">
+    <meta property="og:description" content="The professional portfolio of Xan0, a passionate Full-Stack Developer and Cyber Security enthusiast.">
+    <meta property="og:image" content="https://www.xan0.net/logo.png"> <!-- IMPORTANT: Use an absolute URL for your deployed site -->
+    <meta property="og:url" content="https://www.xan0.net"> <!-- IMPORTANT: Use the final URL of your deployed site -->
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Xan0 | Full-Stack Developer & Security Enthusiast">
+    <meta name="twitter:description" content="The professional portfolio of Xan0, a passionate Full-Stack Developer and Cyber Security enthusiast.">
+    <meta name="twitter:image" content="https://www.xan0.net/logo.png"> <!-- IMPORTANT: Use an absolute URL for your deployed site -->
+
+    <link rel="stylesheet" href="css/style.css">
+    <link href="css/aos.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header & Navigation -->
+    <header class="header">
+        <div class="container">
+            <a href="#home" class="logo-link">
+                <img src="logo.png" alt="Xan0 Logo" class="logo">
+                <span>Xan0</span>
+            </a>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                    <li><a href="#projects" class="nav-link">Projects</a></li>
+                    <li><a href="#skills" class="nav-link">Skills</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+            <button class="mobile-nav-toggle" aria-label="Open navigation menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container" data-aos="fade-up">
+            <h1 class="hero-title">Malware Analyst / Developer<br>Cyber Security Enthusiast</h1>
+            <p class="hero-subtitle">I build web applications and explore the depths of cybersecurity.</p>
+            <div class="hero-actions">
+                <a href="#projects">View My Work</a>
+            </div>
+        </div>
+    </section>
+
+    <main class="main-content">
+        <!-- About Section -->
+        <section id="about" class="container" data-aos="fade-up">
+            <h2 class="section-title">About Me</h2>
+            <p class="section-intro">
+                I'm a self-driven developer with a deep passion for both creating web solutions and understanding the intricacies of cybersecurity. Since I started coding at 13, I've been on a journey to merge these two fields, building projects that are not only functional and user-friendly but also secure against different kinds of attacks. My goal is to leverage my skills to build innovative products and contribute to an easier and more beautiful digital world.
+            </p>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="container" data-aos="fade-up" data-aos-delay="100">
+            <h2 class="section-title">Projects</h2>
+            <div class="cards">
+                <!-- Project Card 1 -->
+                <div class="card" 
+                    data-title="Xan0 V1 - V9" 
+                    data-description="An educational project series exploring low-level system interaction and API hooking through the Windows GDI. This research demonstrates a deep understanding of system internals and payload execution, conducted within a controlled environment for academic purposes."
+                    data-youtube="iHyAs41_2xY"
+                    data-tech="C#, WinAPI, pywin32, GDI">
+                    <h3>Xan0 V1 - V9</h3>
+                    <p>Educational research into Windows GDI and system-level interaction.</p>
+                </div>
+                <!-- Project Card 2 -->
+                <div class="card"
+                    data-title="XCrypt"
+                    data-description="A proof-of-concept project developed to study modern cryptographic standards and file system interactions. It implements AES-256 encryption to demonstrate the core principles of data security and the mechanics of ransomware for defensive research purposes."
+                    data-youtube="w2u2ONjnmzg"
+                    data-tech="Python, Cryptography, File I/O">
+                    <h3>XCrypt</h3>
+                    <p>A Python-based ransomware PoC for cryptographic research.</p>
+                </div>
+                <!-- Project Card 3 -->
+                <div class="card"
+                    data-title="GhostByte"
+                    data-description="A high-performance bot designed to analyze API rate limits and automation capabilities on the Discord platform. This project explores asynchronous programming and WebSocket communication to test and understand API behavior."
+                    data-youtube="jDVMjEndHm4"
+                    data-tech="Python, Discord.py, asyncio, WebSockets">
+                    <h3>GhostByte</h3>
+                    <p>A high-performance bot for Discord API stress testing.</p>
+                </div>
+                <!-- Project Card 4 -->
+                <div class="card" data-title="Streamz" data-description="A full-stack video streaming platform built from scratch. Features user authentication, video uploading/processing, and a responsive front-end. The back-end is powered by Flask, with data stored in a SQLite database." data-tech="Bootstrap, Flask, Sessions, SQLite, JavaScript">
+                    <h3>Streamz</h3>
+                    <p>A custom-built video streaming platform.</p>
+                </div>
+                <!-- Project Card 5 -->
+                <div class="card" data-title="XCloud" data-description="A personal cloud storage solution demonstrating principles of secure file storage and access control. Built with a Python Flask back-end and a simple vanilla JS front-end, this project explores API design, user authentication, and file management." data-tech="Python, Flask, JavaScript, SQLite">
+                    <h3>XCloud</h3>
+                    <p>A personal cloud storage system concept.</p>
+                </div>
+                <!-- Project Card 6 -->
+                <div class="card" data-title="Secure XChat" data-description="An end-to-end encrypted chat application for local networks. This project implements Diffie-Hellman key exchange and AES encryption to ensure message confidentiality and integrity, demonstrating practical application of cryptographic protocols in a real-time environment." data-tech="Python, Sockets, Cryptography, CustomTkinter">
+                    <h3>Secure XChat</h3>
+                    <p>An E2EE local network chat application.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="container" data-aos="fade-up" data-aos-delay="200">
+            <h2 class="section-title">Core Technologies</h2>
+            <ul class="skills">
+                <li>Python</li><li>JavaScript</li><li>HTML5 & CSS3</li><li>Flask</li><li>SQL</li><li>SQLite</li><li>Git & GitHub</li><li>Docker</li><li>Kali Linux</li><li>Penetration Testing</li>
+            </ul>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="container" data-aos="fade-up" data-aos-delay="300">
+            <h2 class="section-title">Get In Touch</h2>
+            <p class="section-intro">I'm always open to discussing new projects, creative ideas, or opportunities to be part of an ambitious vision. Feel free to reach out.</p>
+            <div class="contact-list">
+                <a href="https://github.com/Xan0GDI" target="_blank" rel="noopener noreferrer" class="contact-item">
+                    <img src="avatar/github.png" alt="GitHub Logo">
+                    <span>Xan0GDI</span>
+                </a>
+                <div class="contact-item">
+                    <img src="avatar/discord.png" alt="Discord Logo">
+                    <span>.xan0.</span>
+                </div>
+                <a href="https://www.youtube.com/@Xan0V2" target="_blank" rel="noopener noreferrer" class="contact-item">
+                    <img src="avatar/youtube.png" alt="YouTube Logo">
+                    <span>@Xan0V2</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Xan0. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- The Modal -->
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <div id="modalBody">
+                <div class="video-container" style="display: none;">
+                    <iframe id="modalYoutube" width="560" height="315" src="" title="YouTube video player" frameborder="0" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                </div>
+                <img id="modalImage" src="" alt="Project Image" style="display: none;">
+                <div class="modal-details">
+                    <p id="modalDescription"></p>
+                    <h3>Technologies Used:</h3>
+                    <ul id="modalTech" class="skills"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/aos.js"></script>
+    <script src="js/main.js"></script>
+    <div id="page-bottom-sentinel" style="height: 1px;"></div>
+</body>
+</html>
