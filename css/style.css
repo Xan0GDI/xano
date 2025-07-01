@@ -30,15 +30,14 @@ html {
 }
 
 ::-webkit-scrollbar {
-    width: 8px;
+    width: 0px;
 }
 ::-webkit-scrollbar-track {
     background: var(--bg-dark);
 }
 ::-webkit-scrollbar-thumb {
-    background-color: var(--border-color);
-    border-radius: 10px;
-    border: 2px solid var(--bg-dark);
+    width: 0px;
+    height: 0px;
 }
 
 body {
