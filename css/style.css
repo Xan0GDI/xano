@@ -504,7 +504,15 @@ a.contact-item {
     }
 
     .nav-menu {
-        display: none; /* Hide by default on mobile */
+        /* Keep it rendered but make it invisible for animation */
+        display: flex;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(-10px); /* Adds a subtle slide-down effect */
+        transition: opacity 0.3s ease, visibility 0s 0.3s, transform 0.3s ease;
+
+        /* Existing styles */
         position: fixed;
         top: 0;
         left: 0;
@@ -518,7 +526,11 @@ a.contact-item {
     }
 
     .nav-menu.open {
-        display: flex; /* Show the overlay when .open class is present */
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0);
+        transition-delay: 0s; /* Ensures visibility changes instantly on open */
     }
 
     .nav-menu ul {
