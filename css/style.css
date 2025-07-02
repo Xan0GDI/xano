@@ -30,14 +30,15 @@ html {
 }
 
 ::-webkit-scrollbar {
-    width: 0px;
+    width: 8px;
 }
 ::-webkit-scrollbar-track {
     background: var(--bg-dark);
 }
 ::-webkit-scrollbar-thumb {
-    width: 0px;
-    height: 0px;
+    background-color: var(--border-color);
+    border-radius: 10px;
+    border: 2px solid var(--bg-dark);
 }
 
 body {
@@ -497,7 +498,39 @@ a.contact-item {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 400px) {
+    .mobile-nav-toggle {
+        display: block;
+    }
+
+    .nav-menu {
+        display: none; /* Hide by default on mobile */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(15, 15, 17, 0.95);
+        backdrop-filter: blur(8px);
+        z-index: 999;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-menu.open {
+        display: flex; /* Show the overlay when .open class is present */
+    }
+
+    .nav-menu ul {
+        flex-direction: column; /* Stack links vertically */
+        gap: 2rem;
+    }
+
+    .nav-menu .nav-link {
+        font-size: 1.5rem; /* Make links larger for easy tapping */
+        color: var(--text-primary);
+    }
+
     .card {
         flex-basis: 100%; /* One card per row */
     }
