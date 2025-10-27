@@ -7,21 +7,21 @@
     <link rel="icon" href="logo.png" type="image/png">
 
     <!-- SEO and Embed Meta Tags for sharing on social media -->
-    <meta name="description" content="The official site of Xan0, Malware Developer and Cyber Security enthusiast. Specialized in Remote Access Trojans and Endpoint Penetration Testing.">
+    <meta name="description" content="The professional portfolio of Xan0, a passionate Full-Stack Developer and Cyber Security enthusiast. Specializing in Python, JavaScript, and secure application development.">
     <meta name="author" content="Xan0">
     <meta name="theme-color" content="#111111">
 
     <!-- Open Graph (for Discord, Facebook, WhatsApp, etc.) -->
-    <meta property="og:title" content="Xan0 | Malware & Security">
-    <meta property="og:description" content="The official site of Xan0, Malware Developer and Cyber Security enthusiast. Specialized in Remote Access Trojans and Endpoint Penetration Testing.">
+    <meta property="og:title" content="Xan0 | Full-Stack Developer & Security Enthusiast">
+    <meta property="og:description" content="The professional portfolio of Xan0, a passionate Full-Stack Developer and Cyber Security enthusiast.">
     <meta property="og:image" content="https://www.xan0.net/banner.png">
     <meta property="og:url" content="https://www.xan0.net">
     <meta property="og:type" content="website">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Xan0 | Malware & Security">
-    <meta name="twitter:description" content="The official site of Xan0, Malware Developer and Cyber Security enthusiast. Specialized in Remote Access Trojans and Endpoint Penetration Testing.">
+    <meta name="twitter:title" content="Xan0 | Full-Stack Developer & Security Enthusiast">
+    <meta name="twitter:description" content="The professional portfolio of Xan0, a passionate Full-Stack Developer and Cyber Security enthusiast.">
     <meta name="twitter:image" content="https://www.xan0.net/banner.png">
 
     <!-- Fonts: preconnect and load -->
@@ -35,10 +35,11 @@
 <body>
     <!-- Video Background & Overlays -->
     <div class="bg">
-        <video id="bgVideo" class="bg-video" playsinline autoplay muted loop poster="media/poster.jpg" crossorigin="anonymous">
-            <source src="media/bg.webm" type="video/webm">
-            <source src="media/bg.mp4" type="video/mp4">
+        <video id="bgVideo" class="bg-video" playsinline autoplay muted loop crossorigin="anonymous">
+            <source src="media/ricardo.webm" type="video/webm">
+            <source src="media/ricardo.mp4" type="video/mp4">
         </video>
+        <video id="bgVideo2" class="bg-video" playsinline autoplay muted loop crossorigin="anonymous" style="opacity:0"></video>
         <div class="bg-overlay gradient"></div>
         <div class="bg-overlay flash" aria-hidden="true"></div>
     </div>
@@ -57,9 +58,7 @@
                     <li><a href="#contact" class="nav-link">Contact</a></li>
                 </ul>
             </nav>
-            <div class="hud">
-                <button id="syncBeatButton" class="hud-btn" aria-pressed="false" title="Sync flashes to audio (optional)">Sync</button>
-            </div>
+            <div class="hud"></div>
             <button class="mobile-nav-toggle" aria-label="Open navigation menu" aria-controls="nav" aria-expanded="false">
                 <span></span>
                 <span></span>
@@ -77,7 +76,7 @@
             </h1>
             <p class="hero-subtitle">I am Xan0. The Malware Developer & Cyber Security Enthusiast.</p>
             <div class="hero-actions">
-                <a href="#projects" class="btn-outline">Enter Lab</a>
+                <a href="#projects" class="btn-outline">See my Work</a>
                 <a href="#about" class="btn-outline secondary">About</a>
             </div>
         </div>
@@ -200,7 +199,18 @@
     </div>
 
     <script src="js/aos.js"></script>
+    <div id="tapHint" class="tap-hint" aria-live="polite">Tap to start</div>
+    <button id="bgMenuToggle" class="fab" aria-haspopup="true" aria-expanded="false" aria-controls="bgMenu" title="Backgrounds">BG</button>
+    <div id="bgMenu" class="bg-menu" role="dialog" aria-modal="false" aria-label="Background Videos">
+        <div class="bg-menu-header">Backgrounds <button id="bgSoundToggle" class="mini right" aria-pressed="false" title="Toggle sound">Sound Off</button></div>
+        <ul id="bgList" class="bg-list"></ul>
+        <div class="bg-menu-footer">
+            <button id="bgPrev" class="mini">Prev</button>
+            <button id="bgNext" class="mini">Next</button>
+        </div>
+    </div>
     <script src="js/main.js"></script>
     <div id="page-bottom-sentinel" style="height: 1px;"></div>
 </body>
 </html>
+
