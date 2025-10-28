@@ -114,13 +114,14 @@ document.addEventListener('DOMContentLoaded', function() {
     window.removeEventListener('touchstart', onFirstGesture);
   }
   // Try programmatically first; if blocked, first gesture will unlock
-  setTimeout(() => { ensureAutoplayMuted(); if (tapHint) setTimeout(()=> tapHint.classList.remove('show'), 5000); }, 100);
+  setTimeout(() => { ensureAutoplayMuted(); }, 100);
   window.addEventListener('pointerdown', onFirstGesture, { once: true });
   window.addEventListener('keydown', onFirstGesture, { once: true });
   window.addEventListener('touchstart', onFirstGesture, { once: true });
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') ensureAutoplayMuted(); });
   // Show tap hint initially
   if (tapHint) { tapHint.classList.add('show'); }
+  if (tapHint) { tapHint.addEventListener('click', onFirstGesture); }
 
   // Build BG list menu
   if (bgList) {
