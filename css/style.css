@@ -79,9 +79,10 @@ img { max-width: 100%; height: auto; }
 .hud-btn.active { border-color: var(--red); box-shadow: 0 0 0 1px rgba(255,43,43,0.35) inset; }
 .hud-label { cursor: default; pointer-events: none; font-weight: 600; opacity: 0.85; }
 
-/* Tap to start hint */
-.tap-hint { position: fixed; left: 50%; transform: translateX(-50%) translateY(8px); bottom: 14vh; background: rgba(18,18,22,0.5); color: var(--text); border: 1px solid rgba(255,255,255,0.16); padding: 8px 12px; border-radius: 999px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1200; opacity: 0; pointer-events: none; transition: opacity 220ms ease, transform 220ms ease; font-size: 0.95rem; }
-.tap-hint.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+/* Tap to start overlay */
+.tap-hint { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(10,10,12,0.65); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); z-index: 3000; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 220ms ease, visibility 0s linear 220ms; }
+.tap-hint.show { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 220ms ease; }
+.tap-text { color: var(--text); font-family: 'Zen Kaku Gothic New', sans-serif; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: clamp(1.1rem, 2.8vw, 1.6rem); padding: 12px 18px; border: 1px solid rgba(255,255,255,0.22); border-radius: 999px; background: rgba(18,18,22,0.55); box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
 
 /* Floating BG menu */
 .fab { position: fixed; right: 18px; bottom: 18px; z-index: 1200; background: rgba(18,18,22,0.7); color: var(--text); border: 1px solid rgba(255,255,255,0.2); border-radius: 14px; padding: 10px 14px; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
@@ -97,7 +98,7 @@ img { max-width: 100%; height: auto; }
 .bg-menu-footer .mini, .bg-menu-header .mini { background: transparent; color: var(--text); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 6px 10px; cursor: pointer; }
 
 @media (max-width: 480px) {
-  .tap-hint { bottom: 22vh; font-size: 0.95rem; }
+  .tap-text { font-size: 1rem; padding: 10px 16px; }
 }
 
 .mobile-nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 10px; z-index: 1001; }
