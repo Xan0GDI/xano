@@ -1,579 +1,406 @@
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize AOS library for scroll animations
-  AOS.init({ duration: 600, once: true });
+document.addEventListener('DOMContentLoaded', () => {
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const finePointerQuery = window.matchMedia ? window.matchMedia('(pointer: fine)') : { matches: false };
+  const isPrecisePointer = (evt) => !evt || !evt.pointerType || evt.pointerType === 'mouse' || evt.pointerType === 'pen';
 
-  const body = document.body;
-  const mobileNavToggle = document.querySelector('.mobile-nav-toggle');
-  const navMenu = document.querySelector('.nav-menu');
-  const navLinks = document.querySelectorAll('.nav-link');
-  const modal = document.getElementById('projectModal');
-  const sections = document.querySelectorAll('section[id]');
-  const bgVideo = document.getElementById('bgVideo');
-  const bgVideo2 = document.getElementById('bgVideo2');
-  const syncBtn = document.getElementById('syncBeatButton');
-  const bgPrevBtn = document.getElementById('bgPrev');
-  const bgNextBtn = document.getElementById('bgNext');
-  const bgMenuToggle = document.getElementById('bgMenuToggle');
-  const bgMenu = document.getElementById('bgMenu');
-  const bgList = document.getElementById('bgList');
-  const bgSoundToggle = document.getElementById('bgSoundToggle');
-  const tapHint = document.getElementById('tapHint');
-  const bgContainer = document.querySelector('.bg');
-  if (bgVideo2) { bgVideo2.style.display = 'none'; }
-  let videoPool = new Map(); // key -> HTMLVideoElement
-  const getActiveVideo = () => videoPool.get(BG_VARIANTS[bgIndex].key);
-  const caret = document.querySelector('.caret');
-  let userActivated = false; // becomes true after first user gesture
+  // ------------------------------
+  // Generative background (monochrome flow field)
+  // ------------------------------
+  const canvas = document.getElementById('bgCanvas');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  let dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+  let width = 0, height = 0;
+  let rafId = null;
+  let particles = [];
+  let t = 0; // time for noise scrolling
+  let lastT = performance.now();
 
-  // --- Body Scroll Lock ---
-  const lockScroll = () => { body.classList.add('no-scroll'); };
-  const unlockScroll = () => { if (!modal.classList.contains('show')) body.classList.remove('no-scroll'); };
+  function resize() {
+    dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+    width = Math.floor(window.innerWidth * dpr);
+    height = Math.floor(window.innerHeight * dpr);
+    canvas.width = width;
+    canvas.height = height;
+    canvas.style.width = `${Math.floor(width/dpr)}px`;
+    canvas.style.height = `${Math.floor(height/dpr)}px`;
+    if (!ctx) return;
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0,0,width,height);
+  }
+  resize();
+  // Debounce resize to avoid reinit thrash
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    resize();
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => { initParticles(true); }, 120);
+  });
 
-  // --- Mobile Navigation Logic ---
-  if (mobileNavToggle && navMenu) {
-    mobileNavToggle.addEventListener('click', () => {
-      const open = navMenu.classList.toggle('open');
-      mobileNavToggle.classList.toggle('open');
-      mobileNavToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      if (open) lockScroll(); else unlockScroll();
+  // Lightweight 2D Perlin noise implementation
+  const p = new Uint8Array(512);
+  const perm = new Uint8Array(256);
+  for (let i=0;i<256;i++) perm[i] = i;
+  for (let i=255;i>0;i--) { const j = (Math.random()* (i+1))|0; const tmp=perm[i]; perm[i]=perm[j]; perm[j]=tmp; }
+  for (let i=0;i<512;i++) p[i] = perm[i & 255];
+  function fade(n){return n*n*n*(n*(n*6-15)+10);} // smootherstep
+  function lerp(a,b,t){return a+(b-a)*t;}
+  function grad(hash,x,y){
+    switch(hash & 3){
+      case 0: return  x + y;
+      case 1: return -x + y;
+      case 2: return  x - y;
+      default:return -x - y;
+    }
+  }
+  function perlin2(x,y){
+    const X = Math.floor(x) & 255; const Y = Math.floor(y) & 255;
+    const xf = x - Math.floor(x); const yf = y - Math.floor(y);
+    const u = fade(xf); const v = fade(yf);
+    const aa = p[p[X]+Y], ab = p[p[X]+Y+1];
+    const ba = p[p[X+1]+Y], bb = p[p[X+1]+Y+1];
+    const x1 = lerp(grad(aa, xf,   yf),   grad(ba, xf-1, yf),   u);
+    const x2 = lerp(grad(ab, xf,   yf-1), grad(bb, xf-1, yf-1), u);
+    return (lerp(x1,x2,v)+1)/2; // 0..1
+  }
+
+  function initParticles(fromResize=false) {
+    // Use CSS pixel area for stable counts across DPR
+    const cssArea = window.innerWidth * window.innerHeight;
+    const base = Math.floor(cssArea / 9000);
+    const count = Math.max(140, Math.min(460, base));
+    particles = new Array(count).fill(0).map(() => ({
+      x: Math.random()*width,
+      y: Math.random()*height,
+      s: 0.4 + Math.random()*0.9, // speed factor
+      a: Math.random()*Math.PI*2,
+      life: 0
+    }));
+    if (fromResize) {
+      // Clear immediately to avoid ghost trails on size jumps
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(0,0,width,height);
+    }
+  }
+  initParticles();
+
+  function step(now = performance.now()) {
+    // Compute time delta and clamp
+    const dt = Math.max(0, Math.min(100, now - lastT));
+    lastT = now;
+    // subtle fade to create trails
+    ctx.globalCompositeOperation = 'source-over';
+    // Adjust fade by delta time to keep consistent motion on slow frames
+    const fade = Math.max(0.04, Math.min(0.12, 0.06 * (dt / 16)));
+    ctx.fillStyle = `rgba(10,10,10,${fade.toFixed(3)})`;
+    ctx.fillRect(0,0,width,height);
+
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.lineWidth = 0.7 * dpr;
+
+    const scale = 0.0016 * dpr; // noise scale
+    const flow = 4.2; // angle multiplier
+
+    for (let i=0;i<particles.length;i++){
+      const p = particles[i];
+      const nx = p.x * scale, ny = p.y * scale;
+      const n = perlin2(nx + t*0.08, ny - t*0.05); // 0..1
+      const angle = (n * Math.PI * 2) * flow;
+      const vx = Math.cos(angle) * p.s;
+      const vy = Math.sin(angle) * p.s;
+
+      const ox = p.x, oy = p.y;
+      p.x += vx; p.y += vy; p.life++;
+
+      if (p.x < -5 || p.x > width+5 || p.y < -5 || p.y > height+5 || p.life > 1200){
+        p.x = Math.random()*width; p.y = Math.random()*height; p.life = 0;
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(ox, oy);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+    }
+
+    t += 0.0025 * (dt / 16); // time advance scaled to delta
+    rafId = requestAnimationFrame(step);
+  }
+
+  if (!prefersReduced) {
+    step();
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) { cancelAnimationFrame(rafId); rafId = null; }
+      else if (!rafId) { lastT = performance.now(); rafId = requestAnimationFrame(step); }
     });
+  } else {
+    // Static background
+    ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0,0,width,height);
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    for (let i=0;i<120;i++) { ctx.fillRect(Math.random()*width, Math.random()*height, 1, 1); }
+  }
 
-    navLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        if (navMenu.classList.contains('open')) {
-          navMenu.classList.remove('open');
-          mobileNavToggle.classList.remove('open');
-          mobileNavToggle.setAttribute('aria-expanded', 'false');
-          unlockScroll();
-        }
+  // ------------------------------
+  // Custom cursor (fine pointers only)
+  // ------------------------------
+  let teardownCursor = null;
+  function activateCursor() {
+    if (teardownCursor || !finePointerQuery.matches) return;
+    const dot = document.createElement('div');
+    dot.className = 'cursor-dot';
+    const ring = document.createElement('div');
+    ring.className = 'cursor-ring';
+    document.body.appendChild(ring);
+    document.body.appendChild(dot);
+    document.body.classList.add('has-custom-cursor');
+
+    let targetX = window.innerWidth / 2;
+    let targetY = window.innerHeight / 2;
+    let ringX = targetX;
+    let ringY = targetY;
+    let raf;
+
+    const setDot = (x, y) => {
+      dot.style.left = `${x}px`;
+      dot.style.top = `${y}px`;
+    };
+    const setRing = (x, y) => {
+      ring.style.left = `${x}px`;
+      ring.style.top = `${y}px`;
+    };
+    setDot(targetX, targetY);
+    setRing(ringX, ringY);
+
+    const setVisible = (state) => {
+      dot.classList.toggle('visible', state);
+      ring.classList.toggle('visible', state);
+    };
+
+    const move = (e) => {
+      if (!isPrecisePointer(e)) return;
+      targetX = e.clientX;
+      targetY = e.clientY;
+      setDot(targetX, targetY);
+      setVisible(true);
+    };
+
+    const animate = () => {
+      ringX += (targetX - ringX) * 0.2;
+      ringY += (targetY - ringY) * 0.2;
+      setRing(ringX, ringY);
+      raf = requestAnimationFrame(animate);
+    };
+    animate();
+
+    const leave = (e) => {
+      if (!isPrecisePointer(e)) return;
+      if (!e.relatedTarget) setVisible(false);
+    };
+    const blur = () => setVisible(false);
+
+    const down = (e) => { if (isPrecisePointer(e)) ring.classList.add('pressed'); };
+    const up = () => ring.classList.remove('pressed');
+
+    const interactiveSelectors = 'a, button, .tile, .close-button';
+    const over = (e) => {
+      if (!isPrecisePointer(e)) return;
+      if (e.target.closest(interactiveSelectors)) ring.classList.add('hover');
+    };
+    const out = (e) => {
+      if (!isPrecisePointer(e)) return;
+      const leavingInteractive = e.target.closest(interactiveSelectors) &&
+        (!e.relatedTarget || !e.relatedTarget.closest(interactiveSelectors));
+      if (leavingInteractive) ring.classList.remove('hover');
+    };
+
+    document.addEventListener('pointermove', move);
+    document.body.addEventListener('pointerleave', leave);
+    window.addEventListener('blur', blur);
+    document.addEventListener('pointerdown', down);
+    document.addEventListener('pointerup', up);
+    document.addEventListener('pointerover', over);
+    document.addEventListener('pointerout', out);
+
+    teardownCursor = () => {
+      cancelAnimationFrame(raf);
+      document.body.classList.remove('has-custom-cursor');
+      dot.remove();
+      ring.remove();
+      document.removeEventListener('pointermove', move);
+      document.body.removeEventListener('pointerleave', leave);
+      window.removeEventListener('blur', blur);
+      document.removeEventListener('pointerdown', down);
+      document.removeEventListener('pointerup', up);
+      document.removeEventListener('pointerover', over);
+      document.removeEventListener('pointerout', out);
+      teardownCursor = null;
+    };
+  }
+  if (finePointerQuery.matches) activateCursor();
+  const pointerChange = (e) => {
+    if (e.matches) activateCursor();
+    else if (teardownCursor) teardownCursor();
+  };
+  if (typeof finePointerQuery.addEventListener === 'function') {
+    finePointerQuery.addEventListener('change', pointerChange);
+  } else if (typeof finePointerQuery.addListener === 'function') {
+    finePointerQuery.addListener(pointerChange);
+  }
+
+  // ------------------------------
+  // Dock nav: scroll spy + mobile toggle
+  // ------------------------------
+  const nav = document.getElementById('nav');
+  const dockLinks = Array.from(document.querySelectorAll('.dock-link'));
+  const sections = ['intro','work'].map(id => document.getElementById(id)).filter(Boolean);
+
+  const spy = new IntersectionObserver((entries)=>{
+    entries.forEach(entry => {
+      const id = entry.target.getAttribute('id');
+      if (entry.isIntersecting) {
+        dockLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === `#${id}`));
+      }
+    });
+  }, { rootMargin: '-50% 0px -50% 0px', threshold: 0 });
+  sections.forEach(s => spy.observe(s));
+
+  const dockToggle = document.querySelector('.dock-toggle');
+  if (dockToggle && nav) {
+    const setExpanded = (open) => dockToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    dockToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = nav.classList.toggle('open');
+      setExpanded(open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+    document.addEventListener('click', (e) => {
+      if (!nav.contains(e.target) && e.target !== dockToggle) {
+        nav.classList.remove('open');
+        setExpanded(false);
+        document.body.style.overflow = '';
+      }
+    });
+    // Close on link click (mobile UX)
+    dockLinks.forEach(a => a.addEventListener('click', () => {
+      nav.classList.remove('open');
+      setExpanded(false);
+      document.body.style.overflow = '';
+    }));
+  }
+
+  // ------------------------------
+  // Reveal effects
+  // ------------------------------
+  const revealEls = Array.from(document.querySelectorAll('.reveal'));
+  const revObs = new IntersectionObserver((entries)=>{
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('is-visible'); });
+  }, { threshold: 0.1 });
+  revealEls.forEach(el => revObs.observe(el));
+
+  // ------------------------------
+  // Modal (YouTube embed with nocookie + fallback)
+  // ------------------------------
+  const modal = document.getElementById('projectModal');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalDesc = document.getElementById('modalDescription');
+  const modalTech = document.getElementById('modalTech');
+  const modalYoutube = document.getElementById('modalYoutube');
+  const modalFallback = document.getElementById('modalFallback');
+  const modalFallbackText = document.getElementById('modalFallbackText');
+  const modalYoutubeLink = document.getElementById('modalYoutubeLink');
+  const closeBtn = modal.querySelector('.close-button');
+  const tiles = Array.from(document.querySelectorAll('.tile'));
+
+  if (!prefersReduced) {
+    tiles.forEach(tile => {
+      tile.addEventListener('pointermove', (e) => {
+        if (!isPrecisePointer(e)) return;
+        const rect = tile.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        tile.style.setProperty('--mx', `${x}%`);
+        tile.style.setProperty('--my', `${y}%`);
+      });
+      tile.addEventListener('pointerleave', () => {
+        tile.style.removeProperty('--mx');
+        tile.style.removeProperty('--my');
       });
     });
   }
 
-  // --- Background video carousel (with preloading) ---
-  const BG_VARIANTS = [
-    { key: 'ricardo', webm: 'media/ricardo.webm', mp4: 'media/ricardo.mp4' },
-    { key: 'bg',      webm: 'media/bg.webm',      mp4: 'media/bg.mp4'      },
-    { key: 'scp',     webm: 'media/scp.webm',     mp4: 'media/scp.mp4'     },
-    { key: 'bra',     webm: 'media/bra.webm',     mp4: 'media/bra.mp4'     }
-  ];
-  let bgIndex = 0; // ricardo by default
-
-  function buildVideoElement(set, useExistingEl) {
-    const v = useExistingEl || document.createElement('video');
-    v.className = 'bg-video';
-    v.playsInline = true; v.autoplay = true; v.loop = true; v.muted = true; v.crossOrigin = 'anonymous';
-    v.style.opacity = '0'; v.style.pointerEvents = 'none';
-    let sources = Array.from(v.querySelectorAll('source'));
-    if (sources.length === 0) {
-      const sWebm = document.createElement('source'); sWebm.type = 'video/webm';
-      const sMp4  = document.createElement('source');  sMp4.type  = 'video/mp4';
-      v.appendChild(sWebm); v.appendChild(sMp4); sources = [sWebm, sMp4];
-    }
-    sources.forEach(src => {
-      if (src.type.includes('webm')) src.src = set.webm; else if (src.type.includes('mp4')) src.src = set.mp4;
-    });
-    v.preload = 'auto';
-    try { v.load(); } catch(_) {}
-    // Warm decoder: try a brief play then pause
-    const p = v.play(); if (p && p.then) p.then(() => { try { v.pause(); v.currentTime = 0; } catch(_) {} }).catch(()=>{});
-    if (!useExistingEl && bgContainer) bgContainer.appendChild(v);
-    return v;
+  // Create desc placeholder element if missing
+  if (!modalDesc) {
+    const p = document.createElement('p');
+    p.id = 'modalDescription';
+    modal.querySelector('.modal-details').prepend(p);
   }
 
-  // Build all background videos in the background container, ready to show instantly
-  (function buildPool() {
-    // Ensure initial existing video becomes the first variant (ricardo)
-    if (bgVideo) {
-      videoPool.set('ricardo', buildVideoElement(BG_VARIANTS[0], bgVideo));
-    }
-    // Create the rest
-    for (let i = 1; i < BG_VARIANTS.length; i++) {
-      videoPool.set(BG_VARIANTS[i].key, buildVideoElement(BG_VARIANTS[i]));
-    }
-    // Show default
-    const def = videoPool.get('ricardo');
-    if (def) { def.style.opacity = '1'; try { def.play(); } catch(_) {} }
-  })();
-
-  // Tiny user‑gesture workaround to force autoplay muted
-  function ensureAutoplayMuted() {
-    const vids = Array.from(videoPool.values());
-    vids.forEach(v => { try { v.muted = true; const p = v.play(); if (p && p.catch) p.catch(()=>{}); } catch(_) {} });
-  }
-  function onFirstGesture() {
-    if (userActivated) return;
-    userActivated = true;
-    ensureAutoplayMuted();
-    if (audioCtx && audioCtx.state === 'suspended') { try { audioCtx.resume(); } catch(_) {} }
-    if (tapHint) { tapHint.classList.remove('show'); setTimeout(()=>{ try { tapHint.remove(); } catch(_) {} }, 350); }
-    // Respect saved preference: if user previously enabled sound, enable it now
-    if (localStorage.getItem('bgSound') === 'on') { setAudioEnabled(true); }
-    window.removeEventListener('pointerdown', onFirstGesture);
-    window.removeEventListener('keydown', onFirstGesture);
-    window.removeEventListener('touchstart', onFirstGesture);
-  }
-  // Try programmatically first; if blocked, first gesture will unlock
-  setTimeout(() => { ensureAutoplayMuted(); }, 100);
-  window.addEventListener('pointerdown', onFirstGesture, { once: true });
-  window.addEventListener('keydown', onFirstGesture, { once: true });
-  window.addEventListener('touchstart', onFirstGesture, { once: true });
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') ensureAutoplayMuted(); });
-  // Show tap hint initially
-  if (tapHint) { tapHint.classList.add('show'); }
-  if (tapHint) { tapHint.addEventListener('click', onFirstGesture); }
-
-  // Build BG list menu
-  if (bgList) {
-    bgList.innerHTML = '';
-    BG_VARIANTS.forEach((v, i) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.textContent = v.key;
-      btn.dataset.key = v.key;
-      btn.addEventListener('click', async () => { await crossfadeToIndex(bgIndex, i); bgIndex = i; updateMenuActive(); });
-      bgList.appendChild(btn);
-    });
-    updateMenuActive();
-  }
-
-  // Menu toggle and prev/next
-  if (bgMenuToggle && bgMenu) {
-    const toggleMenu = () => {
-      const open = !bgMenu.classList.contains('open');
-      bgMenu.classList.toggle('open', open);
-      bgMenuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-    };
-    bgMenuToggle.addEventListener('click', (e)=>{ e.stopPropagation(); toggleMenu(); });
-    document.addEventListener('click', (e) => {
-      if (!bgMenu.contains(e.target) && e.target !== bgMenuToggle) {
-        bgMenu.classList.remove('open');
-        bgMenuToggle.setAttribute('aria-expanded', 'false');
-      }
-    });
-  }
-  if (bgPrevBtn) bgPrevBtn.addEventListener('click', () => { go(-1); updateMenuActive(); });
-  if (bgNextBtn) bgNextBtn.addEventListener('click', () => { go(1); updateMenuActive(); });
-
-  function updateMenuActive() {
-    if (!bgList) return;
-    const items = bgList.querySelectorAll('button[data-key]');
-    items.forEach(btn => {
-      if (btn.dataset.key === BG_VARIANTS[bgIndex].key) btn.classList.add('active');
-      else btn.classList.remove('active');
-    });
-  }
-  const mediaSrcMap = new WeakMap();
-  function rebindAudioTo(element) {
-    if (!audioCtx || !element) return;
-    try { if (mediaSrc) { mediaSrc.disconnect(); } } catch(_) {}
+  function extractYouTubeId(val){
+    if (!val) return null;
+    const s = String(val).trim();
+    if (/^[a-zA-Z0-9_-]{11}$/.test(s)) return s;
     try {
-      let node = mediaSrcMap.get(element);
-      if (!node) { node = audioCtx.createMediaElementSource(element); mediaSrcMap.set(element, node); }
-      mediaSrc = node;
-      if (!analyser) { analyser = audioCtx.createAnalyser(); analyser.fftSize = 256; audioBufferLen = analyser.frequencyBinCount; audioDataArray = new Uint8Array(audioBufferLen); }
-      if (!gainNode) { gainNode = audioCtx.createGain(); gainNode.gain.value = 1; }
-      mediaSrc.connect(analyser);
-      mediaSrc.connect(gainNode);
-      if (!gainNode.context) { gainNode = audioCtx.createGain(); gainNode.gain.value = 1; }
-      try { gainNode.connect(audioCtx.destination); } catch(_) {}
-    } catch(e) { console.warn('Audio rebind failed:', e && e.message ? e.message : e); }
-  }
-
-  async function crossfadeToIndex(prevIndex, newIndex) {
-    const currentKey = BG_VARIANTS[prevIndex].key;
-    const nextKey = BG_VARIANTS[newIndex].key;
-    const currentEl = videoPool.get(currentKey);
-    const nextEl = videoPool.get(nextKey);
-    if (!nextEl) return;
-    try { const p = nextEl.play(); if (p && p.catch) p.catch(()=>{}); } catch(_) {}
-    // If sync/audioCtx is active, rebind to the new element
-    if (audioEnabled) { rebindAudioTo(nextEl); nextEl.muted = false; } else { nextEl.muted = true; }
-    nextEl.style.opacity = '1';
-    if (currentEl && currentEl !== nextEl) {
-      currentEl.style.opacity = '0';
-      // Ensure old audio stops
-      try { currentEl.pause(); } catch(_) {}
-    }
-  }
-  async function go(delta) {
-    const prev = bgIndex;
-    bgIndex = (bgIndex + delta + BG_VARIANTS.length) % BG_VARIANTS.length;
-    await crossfadeToIndex(prev, bgIndex);
-    updateBgLabel();
-  }
-  
-
-  // --- Modal Logic ---
-  if (modal) {
-    const closeButton = modal.querySelector('.close-button');
-    const modalTitle = modal.querySelector('#modalTitle');
-    const modalDescription = modal.querySelector('#modalDescription');
-    const modalTechList = modal.querySelector('#modalTech');
-    const modalYoutubeContainer = modal.querySelector('.video-container');
-    const modalYoutubeIframe = modal.querySelector('#modalYoutube');
-    const modalFallback = document.getElementById('modalFallback');
-    const modalYoutubeLink = document.getElementById('modalYoutubeLink');
-    const projectCards = document.querySelectorAll('.card');
-
-    // YouTube API loader (for reliable error handling)
-    let ytPlayer = null;
-    let ytApiReadyPromise = null;
-    function loadYouTubeAPIOnce() {
-      if (window.YT && window.YT.Player) return Promise.resolve(window.YT);
-      if (!ytApiReadyPromise) {
-        ytApiReadyPromise = new Promise((resolve) => {
-          const tag = document.createElement('script');
-          tag.src = 'https://www.youtube.com/iframe_api';
-          document.head.appendChild(tag);
-          window.onYouTubeIframeAPIReady = () => resolve(window.YT);
-        });
+      const u = new URL(s);
+      if (u.hostname.includes('youtu.be')) return u.pathname.replace(/^\//,'');
+      if (u.hostname.includes('youtube.com')) {
+        const v = u.searchParams.get('v'); if (v) return v;
       }
-      return ytApiReadyPromise;
-    }
+    } catch(_){}
+    return null;
+  }
 
-    // Smooth fades for background audio
-    let volFadeRAF = null;
-    let muteSafetyTimeout = null;
-    function fadeElementVolume(el, to, ms) {
-      if (!el) return;
-      if (volFadeRAF) cancelAnimationFrame(volFadeRAF);
-      const from = el.volume;
-      const startT = performance.now();
-      const step = (t) => {
-        const k = Math.min(1, (t - startT) / ms);
-        el.volume = from + (to - from) * k;
-        if (k < 1) volFadeRAF = requestAnimationFrame(step); else volFadeRAF = null;
-      };
-      volFadeRAF = requestAnimationFrame(step);
-    }
+  function openModal(from) {
+    const title = from.dataset.title || 'Project';
+    const desc = from.dataset.description || '';
+    const tech = (from.dataset.tech || '').split(',').map(s => s.trim()).filter(Boolean);
+    const ytid = extractYouTubeId(from.dataset.youtube);
 
-    // Normalize various YouTube inputs to a canonical 11-char ID
-    const extractYouTubeId = (val) => {
-      if (!val) return null;
-      const trimmed = String(val).trim();
-      if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
-      try {
-        const u = new URL(trimmed);
-        if (u.hostname.includes('youtu.be')) {
-          const id = u.pathname.replace(/^\//,'');
-          if (/^[a-zA-Z0-9_-]{11}$/.test(id)) return id;
-        }
-        if (u.hostname.includes('youtube.com')) {
-          const idParam = u.searchParams.get('v');
-          if (idParam && /^[a-zA-Z0-9_-]{11}$/.test(idParam)) return idParam;
-          const parts = u.pathname.split('/');
-          const last = parts[parts.length - 1];
-          if (/^[a-zA-Z0-9_-]{11}$/.test(last)) return last;
-        }
-      } catch (_) {}
-      return null;
-    };
+    modalTitle.textContent = title;
+    document.getElementById('modalDescription').textContent = desc;
+    modalTech.innerHTML = '';
+    tech.forEach(t => { const li = document.createElement('li'); li.textContent = t; modalTech.appendChild(li); });
 
-    // Track background video audio state so we can fade/mute while a YT modal is open
-    let bgAudioSaved = null; // { muted:boolean, volume:number, gain:number|null }
+    modalFallback.style.display = 'none';
+    modalYoutube.src = '';
 
-    const openModal = (card) => {
-      const title = card.dataset.title || 'Project Details';
-      const description = card.dataset.description || 'No description available.';
-      const tech = card.dataset.tech || '';
-      const youtubeId = extractYouTubeId(card.dataset.youtube);
-
-      modalTitle.textContent = title;
-      modalDescription.textContent = description;
-
-      // Populate technologies
-      modalTechList.innerHTML = '';
-      if (tech) {
-        tech.split(',').forEach(techName => {
-          const li = document.createElement('li');
-          li.textContent = techName.trim();
-          modalTechList.appendChild(li);
-        });
-      }
-
-      // Reset states
-      modalFallback.style.display = 'none';
-      if (ytPlayer) { try { ytPlayer.destroy(); } catch(_){} ytPlayer = null; }
-
-      if (youtubeId) {
-        // Save and fade-out background audio, then mute the element as safety
-        try {
-          const activeBg = getActiveVideo();
-          if (!bgAudioSaved && activeBg) {
-            bgAudioSaved = { muted: activeBg.muted, volume: activeBg.volume, gain: (gainNode ? gainNode.gain.value : null) };
-            // Begin fade to silence
-            if (audioCtx && gainNode) {
-              const now = audioCtx.currentTime;
-              gainNode.gain.cancelScheduledValues(now);
-              gainNode.gain.setValueAtTime(gainNode.gain.value, now);
-              gainNode.gain.linearRampToValueAtTime(0.0001, now + 0.35);
-            } else {
-              fadeElementVolume(activeBg, 0, 350);
-            }
-            // After fade, ensure muted flag
-            if (muteSafetyTimeout) { clearTimeout(muteSafetyTimeout); }
-            muteSafetyTimeout = setTimeout(() => { try { activeBg.muted = true; } catch(_){} }, 380);
-          }
-        } catch(_) {}
-
-        // 1) Set direct embed URL immediately so the iframe isn't blank
-        const originParam = (location.origin && location.origin.startsWith('http')) ? `&origin=${encodeURIComponent(location.origin)}` : '';
-        const embedUrl = `https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&mute=1&enablejsapi=1${originParam}`;
-        modalYoutubeIframe.src = embedUrl;
-        modalYoutubeContainer.style.display = 'block';
-
-        // 2) Try to enhance with the IFrame API for better error handling
-        let fallbackTimer = setTimeout(() => {
-          // If API didn't attach and still blank, show fallback link
-          try {
-            const doc = modalYoutubeIframe.contentDocument;
-            if (!doc || doc.location.href === 'about:blank') {
-              modalYoutubeContainer.style.display = 'none';
-              if (modalYoutubeLink) modalYoutubeLink.href = `https://www.youtube.com/watch?v=${youtubeId}`;
-              modalFallback.style.display = 'block';
-            }
-          } catch (_) {}
-        }, 2000);
-
-        loadYouTubeAPIOnce().then((YT) => {
-          if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null; }
-          ytPlayer = new YT.Player('modalYoutube', {
-            width: '560', height: '315', videoId: youtubeId,
-            host: 'https://www.youtube.com',
-            playerVars: {
-              autoplay: 1, rel: 0, modestbranding: 1, playsinline: 1, mute: 1,
-              origin: (location.origin.startsWith('http')) ? location.origin : undefined,
-              enablejsapi: 1
-            },
-            events: {
-              onReady: (e) => { try { e.target.mute(); e.target.playVideo(); } catch(_){} },
-              onError: () => {
-                // Fallback: show direct link on youtube.com
-                modalYoutubeContainer.style.display = 'none';
-                if (modalYoutubeLink) modalYoutubeLink.href = `https://www.youtube.com/watch?v=${youtubeId}`;
-                modalFallback.style.display = 'block';
-              }
-            }
-          });
-        }).catch(() => {
-          if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null; }
-          // API failed; show fallback link
-          modalYoutubeContainer.style.display = 'none';
-          if (modalYoutubeLink) modalYoutubeLink.href = `https://www.youtube.com/watch?v=${youtubeId}`;
-          modalFallback.style.display = 'block';
-        });
+    if (ytid) {
+      const url = `https://www.youtube-nocookie.com/embed/${ytid}?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1`;
+      modalYoutube.parentElement.style.display = 'block';
+      // Use load event for a smooth reveal; no cross-origin peeking
+      const onLoad = () => { modalYoutube.removeEventListener('load', onLoad); };
+      modalYoutube.addEventListener('load', onLoad);
+      modalYoutube.src = url;
+    } else {
+      modalYoutube.parentElement.style.display = 'none';
+      modalFallback.style.display = 'block';
+      const fallbackCopy = from.dataset.fallback || 'Video unavailable.';
+      if (modalFallbackText) modalFallbackText.textContent = fallbackCopy;
+      const fallbackLink = from.dataset.fallbackLink;
+      if (fallbackLink) {
+        modalYoutubeLink.style.display = '';
+        modalYoutubeLink.textContent = from.dataset.fallbackLinkLabel || 'Open link';
+        modalYoutubeLink.href = fallbackLink;
       } else {
-        modalYoutubeContainer.style.display = 'none';
-      }
-
-      modal.classList.add('show');
-      lockScroll();
-    };
-
-    const closeModal = () => {
-      modal.classList.remove('show');
-      try { if (ytPlayer) { ytPlayer.stopVideo(); ytPlayer.destroy(); } } catch(_){}
-      ytPlayer = null;
-      modalYoutubeIframe.src = '';
-      modalFallback.style.display = 'none';
-      // Restore background video audio state if we muted it
-      try {
-        const activeBg = getActiveVideo();
-        if (bgAudioSaved && activeBg) {
-          // Restore gain/volume smoothly
-          const targetVol = Math.max(0, Math.min(1, bgAudioSaved.volume ?? 1));
-          if (audioCtx && gainNode) {
-            // Unmute immediately if it was unmuted before, so the ramp is audible
-            if (!bgAudioSaved.muted) activeBg.muted = false;
-            const now = audioCtx.currentTime;
-            gainNode.gain.cancelScheduledValues(now);
-            gainNode.gain.setValueAtTime(gainNode.gain.value || 0.0001, now);
-            const targetGain = (typeof bgAudioSaved.gain === 'number') ? bgAudioSaved.gain : 1;
-            gainNode.gain.linearRampToValueAtTime(Math.max(0.0001, targetGain), now + 0.45);
-          } else {
-            // Unmute first if it was not originally muted
-            if (!bgAudioSaved.muted) activeBg.muted = false;
-            fadeElementVolume(activeBg, targetVol, 450);
-          }
-          // Finally restore muted flag to original state after the fade
-          if (muteSafetyTimeout) { clearTimeout(muteSafetyTimeout); muteSafetyTimeout = null; }
-          setTimeout(() => {
-            try { activeBg.muted = !!bgAudioSaved.muted; } catch(_){}
-          }, 480);
-        }
-        bgAudioSaved = null;
-      } catch(_) {}
-      if (!navMenu || !navMenu.classList.contains('open')) unlockScroll();
-    };
-
-    projectCards.forEach(card => { card.addEventListener('click', () => openModal(card)); });
-    closeButton.addEventListener('click', closeModal);
-    modal.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
-  }
-
-  // --- Active Nav Link on Scroll (Scrollspy) ---
-  const scrollSpy = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      const id = entry.target.getAttribute('id');
-      const activeLink = document.querySelector(`.nav-menu a[href="#${id}"]`);
-      if (entry.isIntersecting) {
-        navLinks.forEach(link => link.classList.remove('active'));
-        if (activeLink) activeLink.classList.add('active');
-      }
-    });
-  }, { rootMargin: '-50% 0px -50% 0px', threshold: 0 });
-  sections.forEach(section => scrollSpy.observe(section));
-
-  // --- Bottom sentinel handling ---
-  const bottomSentinel = document.getElementById('page-bottom-sentinel');
-  if (bottomSentinel) {
-    const bottomObserver = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        navLinks.forEach(link => link.classList.remove('active'));
-        const lastLink = document.querySelector('.nav-menu li:last-child a');
-        if (lastLink) lastLink.addEventListener('animationend', ()=>{}, { once:true });
-        if (lastLink) lastLink.classList.add('active');
-      }
-    }, { threshold: 1.0 });
-    bottomObserver.observe(bottomSentinel);
-  }
-
-  // --- Beat metronome for subtle flashing ---
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let effectsEnabled = !prefersReduced; // allow user override via Sync
-  let rafId = null;
-  let start = performance.now();
-  let bpm = 120; // default pulse
-
-  const tick = (t) => {
-    const elapsed = (t - start) / 1000; // seconds
-    const phase = (elapsed * bpm) / 60 * Math.PI * 2; // radians
-    const s = Math.sin(phase);
-    // Ease and clamp the flash intensity (0..1)
-    const intensity = Math.max(0, s);
-    // Add a small floor to keep it breathing
-    const eased = Math.min(1, 0.12 + 0.35 * Math.pow(intensity, 1.6));
-    document.documentElement.style.setProperty('--flash', effectsEnabled ? eased.toFixed(3) : '0');
-    // Blink caret (~0.8s cycle), combine with flash intensity
-    if (caret) {
-      const blink = (Math.sin(elapsed * (Math.PI * 2) / 0.8) > 0) ? 1 : 0.25;
-      const caretOpacity = prefersReduced ? 0.85 : Math.max(0.25, Math.min(1, blink * (0.6 + 0.6 * eased)));
-      caret.style.opacity = caretOpacity.toFixed(2);
-    }
-    rafId = requestAnimationFrame(tick);
-  };
-  if (!prefersReduced) rafId = requestAnimationFrame(tick);
-
-  // Optional: sync to audio energy from the video after user gesture
-  // Keep audio graph single-instance to avoid MediaElementSourceNode duplication errors
-  let audioCtx = null;
-  let mediaSrc = null;
-  let analyser = null;
-  let gainNode = null; // for smooth volume fades when using AudioContext
-  let audioDataArray = null;
-  let audioBufferLen = 0;
-  let audioEnabled = (localStorage.getItem('bgSound') === 'on');
-
-  function updateSoundUI() {
-    if (bgSoundToggle) {
-      bgSoundToggle.textContent = audioEnabled ? 'Sound On' : 'Sound Off';
-      bgSoundToggle.setAttribute('aria-pressed', audioEnabled ? 'true' : 'false');
-      if (audioEnabled) bgSoundToggle.classList.add('active'); else bgSoundToggle.classList.remove('active');
-    }
-  }
-
-  function startAudioSyncLoop() {
-    if (!analyser) return;
-    if (rafId) cancelAnimationFrame(rafId);
-    const audioTick = () => {
-      analyser.getByteFrequencyData(audioDataArray);
-      const bins = Math.max(1, Math.floor(audioBufferLen * 0.25));
-      let sum = 0;
-      for (let i = 1; i < bins; i++) sum += audioDataArray[i];
-      const avg = sum / bins; // 0..255
-      const norm = avg / 255; // 0..1
-      const eased = Math.min(1, 0.12 + 0.55 * Math.pow(norm, 1.2));
-      document.documentElement.style.setProperty('--flash', effectsEnabled ? eased.toFixed(3) : '0');
-      if (caret) {
-        const blink = (Math.sin((performance.now()-start)/1000 * (Math.PI * 2) / 0.8) > 0) ? 1 : 0.25;
-        const caretOpacity = prefersReduced ? 0.85 : Math.max(0.25, Math.min(1, blink * (0.6 + 0.6 * eased)));
-        caret.style.opacity = caretOpacity.toFixed(2);
-      }
-      rafId = requestAnimationFrame(audioTick);
-    };
-    rafId = requestAnimationFrame(audioTick);
-  }
-
-  async function setAudioEnabled(on) {
-    audioEnabled = !!on;
-    localStorage.setItem('bgSound', audioEnabled ? 'on' : 'off');
-    updateSoundUI();
-    const active = getActiveVideo();
-    if (!active) return;
-    if (!audioEnabled) {
-      // Mute all and go back to metronome
-      Array.from(videoPool.values()).forEach(v => { try { v.muted = true; } catch(_) {} });
-      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-      rafId = requestAnimationFrame(tick);
-      try { if (mediaSrc) mediaSrc.disconnect(); } catch(_) {}
-      return;
-    }
-    try {
-      active.muted = false; active.volume = 1; await active.play();
-      if (!audioCtx && location.protocol !== 'file:') {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext; audioCtx = new AudioCtx();
-      }
-      if (audioCtx) { if (audioCtx.state === 'suspended') await audioCtx.resume(); rebindAudioTo(active); startAudioSyncLoop(); }
-    } catch(e) { console.warn('Enable audio failed:', e && e.message ? e.message : e); }
-  }
-
-  if (bgSoundToggle) {
-    bgSoundToggle.addEventListener('click', async () => { await setAudioEnabled(!audioEnabled); });
-    updateSoundUI();
-  }
-
-  // --- Typewriter effect for the hero title (once) ---
-  const titleEl = document.querySelector('.hero-title');
-  if (titleEl && !prefersReduced) {
-    const caretEl = titleEl.querySelector('.caret');
-    // Extract text excluding caret
-    const fullText = Array.from(titleEl.childNodes)
-      .filter(n => n.nodeType === Node.TEXT_NODE)
-      .map(n => n.textContent)
-      .join('').trim();
-    if (fullText) {
-      // Clear text and type
-      titleEl.childNodes.forEach(n => { if (n.nodeType === Node.TEXT_NODE) n.textContent = ''; });
-      let i = 0;
-      const type = () => {
-        if (i <= fullText.length) {
-          // Update text node (create if needed)
-          if (!titleEl.firstChild || titleEl.firstChild.nodeType !== Node.TEXT_NODE) {
-            titleEl.insertBefore(document.createTextNode(''), titleEl.firstChild);
-          }
-          titleEl.firstChild.textContent = fullText.slice(0, i);
-          i += Math.random() < 0.15 ? 2 : 1; // occasional double-step
-          setTimeout(type, 28 + Math.random() * 60);
-        }
-      };
-      type();
-      if (caretEl) titleEl.appendChild(caretEl); // ensure caret stays last
-    }
-  }
-
-  // --- Global Keydown Listener ---
-  window.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-      if (modal && modal.classList.contains('show')) {
-        modal.querySelector('.close-button').click();
-      } else if (navMenu && navMenu.classList.contains('open')) {
-        mobileNavToggle.click();
+        modalYoutubeLink.removeAttribute('href');
+        modalYoutubeLink.style.display = 'none';
       }
     }
-  });
+
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden', 'true');
+    try { modalYoutube.src = ''; } catch(_){}
+    document.body.style.overflow = '';
+  }
+
+  tiles.forEach(tile => tile.addEventListener('click', () => openModal(tile)));
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e)=>{ if (e.target === modal) closeModal(); });
+  window.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' && modal.classList.contains('show')) closeModal(); });
 });
-
-
-
-
