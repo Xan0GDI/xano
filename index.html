@@ -1,215 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xan0 | Malware & Security</title>
-    <link rel="icon" href="logo.png" type="image/png">
-
-    <!-- SEO and Embed Meta Tags for sharing on social media -->
-    <meta name="description" content="The professional portfolio of Xan0, a passionate Full-Stack Developer and Cyber Security enthusiast. Specializing in Python, JavaScript, and secure application development.">
-    <meta name="author" content="Xan0">
-    <meta name="theme-color" content="#111111">
-
-    <!-- Open Graph (for Discord, Facebook, WhatsApp, etc.) -->
-    <meta property="og:title" content="Xan0 | Full-Stack Developer & Security Enthusiast">
-    <meta property="og:description" content="The professional portfolio of Xan0, a passionate Full-Stack Developer and Cyber Security enthusiast.">
-    <meta property="og:image" content="https://www.xan0.net/banner.png">
-    <meta property="og:url" content="https://www.xan0.net">
-    <meta property="og:type" content="website">
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Xan0 | Full-Stack Developer & Security Enthusiast">
-    <meta name="twitter:description" content="The professional portfolio of Xan0, a passionate Full-Stack Developer and Cyber Security enthusiast.">
-    <meta name="twitter:image" content="https://www.xan0.net/banner.png">
-
-    <!-- Fonts: preconnect and load -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="css/style.css">
-    <link href="css/aos.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XAN0</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="color-scheme" content="dark">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script defer src="js/main.js"></script>
 </head>
 <body>
-    <!-- Video Background & Overlays -->
-    <div class="bg">
-        <video id="bgVideo" class="bg-video" playsinline autoplay muted loop crossorigin="anonymous">
-            <source src="media/ricardo.webm" type="video/webm">
-            <source src="media/ricardo.mp4" type="video/mp4">
-        </video>
-        <video id="bgVideo2" class="bg-video" playsinline autoplay muted loop crossorigin="anonymous" style="opacity:0"></video>
-        <div class="bg-overlay gradient"></div>
-        <div class="bg-overlay flash" aria-hidden="true"></div>
-    </div>
-    <!-- Header & Navigation -->
-    <header class="header">
-        <div class="container">
-            <a href="#home" class="logo-link">
-                <img src="logo.png" alt="Xan0 Logo" class="logo">
-            </a>
-            <nav class="nav-menu" id="nav">
-                <ul>
-                    <li><a href="#about" class="nav-link">About</a></li>
-                    <li><a href="#projects" class="nav-link">Experiments</a></li>
-                    <li><a href="#skills" class="nav-link">Skills</a></li>
-                    <li><a href="#contact" class="nav-link">Contact</a></li>
-                </ul>
-            </nav>
-            <div class="hud"></div>
-            <button class="mobile-nav-toggle" aria-label="Open navigation menu" aria-controls="nav" aria-expanded="false">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-        </div>
-    </header>
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="container" data-aos="fade-up">
-            <h1 class="hero-title">
-                MALWARE & SECURITY
-                <span class="caret" aria-hidden="true"></span>
-            </h1>
-            <p class="hero-subtitle">I am Xan0. The Malware Developer & Cyber Security Enthusiast.</p>
-            <div class="hero-actions">
-                <a href="#projects" class="btn-outline">See my Work</a>
-                <a href="#about" class="btn-outline secondary">About</a>
-            </div>
-        </div>
+  <main>
+    <section id="intro" class="center hero reveal">
+      <h1 class="wordmark">XAN0</h1>
     </section>
+    <section id="work" class="projects reveal" aria-label="Projects">
+      <div class="grid">
+        <article class="tile" role="button" tabindex="0"
+                 data-title="Xan0 V1 - V10"
+                 data-description="An educational series exploring low-level system interaction and API hooking through Windows GDI. Conducted in a controlled environment for academic research."
+                 data-youtube="zlohrqK1rHs"
+                 data-tech="C#, WinAPI, pywin32, GDI">
+          <span class="tile-title">Xan0 V1 - V10</span>
+        </article>
+        <article class="tile" role="button" tabindex="0"
+                 data-title="XCrypt"
+                 data-description="AES-256 encryption proof-of-concept focused on cryptographic rigor and behavior."
+                 data-youtube="w2u2ONjnmzg"
+                 data-tech="Python, Cryptography, File I/O">
+          <span class="tile-title">XCrypt</span>
+        </article>
+        <article class="tile" role="button" tabindex="0"
+                 data-title="GhostByte"
+                 data-description="Asynchronous pressure testing of Discord API envelopes to study rate limits and automation behavior."
+                 data-youtube="jDVMjEndHm4"
+                 data-tech="Python, Discord.py, asyncio, WebSockets">
+          <span class="tile-title">GhostByte</span>
+        </article>
+        <article class="tile" role="button" tabindex="0"
+                 data-title="Streamz"
+                 data-description="Portable video streaming platform with Flask and SQLite."
+                 data-tech="Bootstrap, Flask, Sessions, SQLite, JavaScript"
+                 data-fallback="Private showcase. Video withheld.">
+          <span class="tile-title">Streamz</span>
+        </article>
+        <article class="tile" role="button" tabindex="0"
+                 data-title="XanaX"
+                 data-description="Discord-controlled RAT for research into command surfaces and defensive behaviors."
+                 data-tech="Python"
+                 data-fallback="Research tooling kept offline.">
+          <span class="tile-title">XanaX</span>
+        </article>
+      </div>
+    </section>
+  </main>
 
-    <main class="main-content">
-        <!-- About Section -->
-        <section id="about" class="container" data-aos="fade-up">
-            <h2 class="section-title">About Me</h2>
-            <p class="section-intro">
-                I'm a self-driven developer with a deep passion for both creating web solutions and understanding the intricacies of cybersecurity. Since I started coding at 13, I've been on a journey to merge these two fields, building projects that are functional and user-friendly. My goal is to leverage my skills to build innovative products and always learn something new.
-            </p>
-        </section>
-
-        <!-- Projects Section -->
-        <section id="projects" class="container" data-aos="fade-up" data-aos-delay="100">
-            <h2 class="section-title">Experiments</h2>
-            <div class="cards">
-                <!-- Project Card 1 -->
-                <div class="card" 
-                    data-title="Xan0 V1 - V10" 
-                    data-description="An educational project series exploring low-level system interaction and API hooking through the Windows GDI. This research demonstrates a deep understanding of system internals and payload execution, conducted within a controlled environment for academic purposes."
-                    data-youtube="zlohrqK1rHs"
-                    data-tech="C#, WinAPI, pywin32, GDI">
-                    <h3>Xan0 V1 - V10</h3>
-                    <p>Educational research into Windows GDI and system-level interaction.</p>
-                </div>
-                <!-- Project Card 2 -->
-                <div class="card"
-                    data-title="XCrypt"
-                    data-description="A proof-of-concept project developed to study modern cryptographic standards and file system interactions. It implements AES-256 encryption to demonstrate the core principles of data security and the mechanics of ransomware for defensive research purposes."
-                    data-youtube="w2u2ONjnmzg"
-                    data-tech="Python, Cryptography, File I/O">
-                    <h3>XCrypt</h3>
-                    <p>A Python-based ransomware PoC for cryptographic research.</p>
-                </div>
-                <!-- Project Card 3 -->
-                <div class="card"
-                    data-title="GhostByte"
-                    data-description="A high-performance bot designed to analyze API rate limits and automation capabilities on the Discord platform. This project explores asynchronous programming and WebSocket communication to test and understand API behavior."
-                    data-youtube="jDVMjEndHm4"
-                    data-tech="Python, Discord.py, asyncio, WebSockets">
-                    <h3>GhostByte</h3>
-                    <p>A high-performance bot for Discord API stress testing.</p>
-                </div>
-                <!-- Project Card 4 -->
-                <div class="card" data-title="Streamz" data-description="A video streaming platform built from scratch. Features user authentication, video uploading/processing, and a responsive front-end. The back-end is powered by Flask, with data stored in a SQLite database. Also its easy to setup and portable" data-tech="Bootstrap, Flask, Sessions, SQLite, JavaScript">
-                    <h3>Streamz</h3>
-                    <p>A portable video streaming platform.</p>
-                </div>
-                <!-- Project Card 5 -->
-                <div class="card" data-title="XanaX" data-description="A powerful discord RAT (Remote Access Trojan) that is capable of being 100% undetected on windows systems (10 and 11). It currently features 70+ commands and a wide range of features and capabilities that reach from basic wallpaper manipulation to total system destruction and spying." data-tech="Python">
-                    <h3>XanaX</h3>
-                    <p>A remote access trojan controlled through discord.</p>
-                </div>
-                <!-- Project Card 6 -->
-                <div class="card" data-title="Secure XChat" data-description="An end-to-end encrypted chat application for local networks. This project implements Diffie-Hellman key exchange and AES encryption to ensure message confidentiality and integrity, demonstrating practical application of cryptographic protocols in a real-time environment." data-tech="Python, Sockets, Cryptography, CustomTkinter">
-                    <h3>Secure XChat</h3>
-                    <p>An E2EE local network chat application.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Skills Section -->
-        <section id="skills" class="container" data-aos="fade-up" data-aos-delay="200">
-            <h2 class="section-title">Core Technologies</h2>
-            <ul class="skills">
-                <li>Python</li><li>JavaScript</li><li>HTML5 & CSS3</li><li>Flask</li><li>SQL</li><li>Git</li><li>Docker</li><li>Kali Linux</li><li>Penetration Testing</li><li>Malware Development</li>
-            </ul>
-        </section>
-
-        <!-- Contact Section -->
-        <section id="contact" class="container" data-aos="fade-up" data-aos-delay="300">
-            <h2 class="section-title">Get In Touch</h2>
-            <p class="section-intro">I'm always open to discussing new projects, creative ideas, or opportunities to be part of an ambitious vision. Feel free to reach out.</p>
-            <div class="contact-list">
-                <a href="https://github.com/Xan0GDI" target="_blank" rel="noopener noreferrer" class="contact-item">
-                    <img src="avatar/github.png" alt="GitHub Logo">
-                    <span>Xan0GDI</span>
-                </a>
-                <div class="contact-item">
-                    <img src="avatar/discord.png" alt="Discord Logo">
-                    <span>xan0._</span>
-                </div>
-                <a href="https://www.youtube.com/@Xan0V2" target="_blank" rel="noopener noreferrer" class="contact-item">
-                    <img src="avatar/youtube.png" alt="YouTube Logo">
-                    <span>@Xan0V2</span>
-                </a>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 Xan0. All Rights Reserved.</p>
+  <div id="projectModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button class="close-button" aria-label="Close">x</button>
+      <h3 id="modalTitle"></h3>
+      <div class="modal-body">
+        <div class="video-container">
+          <iframe id="modalYoutube" title="Project Video" src="" frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen></iframe>
         </div>
-    </footer>
-
-    <!-- The Modal -->
-    <div id="projectModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2 id="modalTitle"></h2>
-            <div id="modalBody">
-                <div class="video-container" style="display: none;">
-                    <iframe id="modalYoutube" width="560" height="315" src="" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
-                </div>
-                <div id="modalFallback" class="yt-fallback" style="display:none;">
-                    <a id="modalYoutubeLink" class="btn-outline" target="_blank" rel="noopener">Watch on YouTube</a>
-                </div>
-                <img id="modalImage" src="" alt="Project Image" style="display: none;">
-                <div class="modal-details">
-                    <p id="modalDescription"></p>
-                    <h3>Technologies Used:</h3>
-                    <ul id="modalTech" class="skills"></ul>
-                </div>
-            </div>
+        <div class="modal-details">
+          <p id="modalDescription"></p>
+          <ul id="modalTech" class="tags"></ul>
+          <p id="modalFallback" style="display:none">
+            <span id="modalFallbackText">Video unavailable.</span>
+            <a id="modalYoutubeLink" target="_blank" rel="noopener noreferrer">Open on YouTube</a>
+          </p>
         </div>
+      </div>
     </div>
-
-    <script src="js/aos.js"></script>
-    <div id="tapHint" class="tap-hint" aria-live="polite"><span class="tap-text">Tap to start</span></div>
-    <button id="bgMenuToggle" class="fab" aria-haspopup="true" aria-expanded="false" aria-controls="bgMenu" title="Backgrounds">BG</button>
-    <div id="bgMenu" class="bg-menu" role="dialog" aria-modal="false" aria-label="Background Videos">
-        <div class="bg-menu-header">Backgrounds <button id="bgSoundToggle" class="mini right" aria-pressed="false" title="Toggle sound">Sound Off</button></div>
-        <ul id="bgList" class="bg-list"></ul>
-        <div class="bg-menu-footer">
-            <button id="bgPrev" class="mini">Prev</button>
-            <button id="bgNext" class="mini">Next</button>
-        </div>
-    </div>
-    <script src="js/main.js"></script>
-    <div id="page-bottom-sentinel" style="height: 1px;"></div>
+  </div>
 </body>
 </html>
-
