@@ -184,6 +184,85 @@ main { position: relative; z-index: 1; display: flex; flex-direction: column; ga
   background: repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 80px),
               repeating-linear-gradient(180deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 80px);
   opacity: 0.25;
+  overflow: hidden;
+}
+.hero-sculpture .console-flow {
+  position: absolute;
+  inset: 10%;
+  padding: clamp(18px, 4vw, 42px);
+  display: flex;
+  align-items: flex-end;
+  background: linear-gradient(180deg, rgba(5,5,5,0), rgba(5,5,5,0.35) 30%, rgba(5,5,5,0.7));
+  mix-blend-mode: lighten;
+  font-size: clamp(0.7rem, 1.2vw, 1rem);
+  color: rgba(166,255,234,0.9);
+  letter-spacing: 0.08em;
+  mask-image: linear-gradient(to top, transparent, #000 15%, #000 85%, transparent);
+  pointer-events: none;
+  transform: translateZ(60px) rotateX(18deg) rotateY(-12deg);
+  transform-origin: center;
+}
+.console-stream {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-transform: none;
+  width: 100%;
+}
+.console-line {
+  position: relative;
+  padding-left: 18px;
+  min-height: 1.1em;
+  text-shadow: 0 0 18px rgba(79,255,203,0.4);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: consoleReveal 0.55s var(--ease) forwards;
+}
+.console-line::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.35em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(166,255,234,0.85), transparent 65%);
+  box-shadow: 0 0 12px rgba(79,255,203,0.5);
+}
+.console-line.cmd { color: rgba(186,255,238,0.92); font-weight: 600; letter-spacing: 0.04em; }
+.console-line.resp { color: rgba(140,235,205,0.88); }
+.console-line.system { color: rgba(210,234,255,0.8); font-style: italic; }
+.console-line.thinking {
+  color: rgba(166,255,234,0.7);
+  letter-spacing: 0.12em;
+  padding-left: 0;
+}
+.console-line.thinking::before { display: none; }
+.console-text { display: inline-block; }
+.console-cursor {
+  margin-left: 4px;
+  color: rgba(196,255,240,0.85);
+  animation: consoleCursor 0.85s steps(2) infinite;
+}
+.thinking-dots::before {
+  content: '....';
+  display: inline-block;
+  width: 0;
+  overflow: hidden;
+  animation: thinkingDots 1.2s steps(4) infinite;
+}
+
+@keyframes consoleReveal {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 0.95; transform: translateY(0); }
+}
+@keyframes consoleCursor {
+  0%, 45% { opacity: 0.85; }
+  55%, 100% { opacity: 0.1; }
+}
+@keyframes thinkingDots {
+  0% { width: 0; }
+  100% { width: 1.6em; }
 }
 
 .hero-inner {
@@ -361,6 +440,3 @@ main { position: relative; z-index: 1; display: flex; flex-direction: column; ga
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0s !important; transition-duration: 0s !important; }
 }
-
-
-

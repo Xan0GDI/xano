@@ -1,4 +1,4 @@
-﻿document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointerQuery = window.matchMedia('(pointer: fine)');
   const isPrecisePointer = (evt) => !evt || !evt.pointerType || evt.pointerType === 'mouse' || evt.pointerType === 'pen';
@@ -453,4 +453,132 @@
   window.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && modal?.classList.contains('show')) closeModal();
   });
+
+  // Console flow typing effect
+const consoleScripts = [
+  { type: 'cmd', text: 'X$ systemctl start node-engine@x0', pause: 420 },
+  { type: 'resp', text: '[ ok ] node-engine[x0] started successfully', pause: 360 },
+
+  { type: 'cmd', text: 'X$ traceroute -n uplink.core.local --max-hops=6', pause: 280 },
+  { type: 'resp', text: '1: 10.77.0.12  2: 10.77.1.8  3: 172.16.4.3  4: 192.168.0.1', pause: 540, thinkBefore: true, thinkText: 'resolving hops', thinkDuration: 1200 },
+
+  { type: 'cmd', text: 'X$ openssl rand -hex 64 > /tmp/auth.vector', pause: 320 },
+  { type: 'resp', text: 'generated 512-bit entropy vector: /tmp/auth.vector', pause: 480, thinkBefore: true, thinkText: 'collecting system entropy', thinkDuration: 900 },
+
+  { type: 'cmd', text: 'X$ curl -s -X POST https://telemetry.internal/api/payload -d "id=42&hex=aeff104b"', pause: 350 },
+  { type: 'resp', text: 'HTTP/1.1 200 OK :: telemetry packet accepted (#42)', pause: 520 },
+
+  { type: 'cmd', text: 'X$ ps -eo pid,cmd --sort=%cpu | head -n 5', pause: 280 },
+  { type: 'resp', text: '3 worker processes active • CPU load steady', pause: 460, thinkBefore: true, thinkText: 'reading process table', thinkDuration: 800 },
+
+  { type: 'cmd', text: 'X$ modprobe specter_mode opacity=0.12', pause: 300 },
+  { type: 'resp', text: 'kernel module loaded: specter_mode (opacity=0.12)', pause: 620, thinkBefore: true, thinkText: 'loading kernel modules', thinkDuration: 1100 },
+
+  { type: 'cmd', text: 'X$ journalctl -u node-engine@x0 --since "1 min ago"', pause: 340 },
+  { type: 'resp', text: 'no critical events logged in the last 60 seconds', pause: 520 },
+
+  { type: 'cmd', text: 'X$ df -h /var | tail -1', pause: 300 },
+  { type: 'resp', text: '/var usage: 37% • filesystem healthy', pause: 450, thinkBefore: true, thinkText: 'checking disk utilization', thinkDuration: 700 },
+
+  { type: 'cmd', text: 'X$ netstat -tunlp | grep ":443"', pause: 330 },
+  { type: 'resp', text: 'secure channel listener active on 0.0.0.0:443 (pid 1124)', pause: 600 },
+
+  { type: 'cmd', text: 'X$ echo "awaiting directive…" >> /var/log/agent.log', pause: 800 },
+  { type: 'system', text: 'listening on secure channel...', pause: 900 }
+];
+
+
+  const trimConsoleLines = (container, maxLines) => {
+    while (container.children.length > maxLines) {
+      container.removeChild(container.firstChild);
+    }
+  };
+
+  const typeConsoleLine = (container, entry, maxLines) => new Promise((resolve) => {
+    const line = document.createElement('div');
+    line.classList.add('console-line', entry.type || 'resp');
+    const textSpan = document.createElement('span');
+    textSpan.className = 'console-text';
+    line.appendChild(textSpan);
+
+    if (entry.type === 'thinking') {
+      line.classList.add('thinking');
+      textSpan.textContent = entry.text || 'processing';
+      const dots = document.createElement('span');
+      dots.className = 'thinking-dots';
+      dots.setAttribute('aria-hidden', 'true');
+      line.appendChild(dots);
+      container.appendChild(line);
+      trimConsoleLines(container, maxLines);
+      const duration = prefersReduced ? 200 : entry.duration || 1200;
+      setTimeout(resolve, duration);
+      return;
+    }
+
+    const shouldType = entry.type === 'cmd';
+    container.appendChild(line);
+    trimConsoleLines(container, maxLines);
+
+    if (!shouldType || prefersReduced) {
+      textSpan.textContent = entry.text || '';
+      const delay = prefersReduced ? 20 : entry.printDelay || 160;
+      setTimeout(resolve, delay);
+      return;
+    }
+
+    const cursor = document.createElement('span');
+    cursor.className = 'console-cursor';
+    cursor.textContent = '▋';
+    line.appendChild(cursor);
+
+    let index = 0;
+    const chars = entry.text || '';
+    const speed = Math.max(12, entry.speed || 26);
+
+    const typeNext = () => {
+      textSpan.textContent = chars.slice(0, index + 1);
+      index += 1;
+      if (index >= chars.length) {
+        cursor.remove();
+        resolve();
+        return;
+      }
+      setTimeout(typeNext, speed);
+    };
+    typeNext();
+  });
+
+  const playConsoleEntry = (stream, entry, maxLines) => {
+    if (entry.thinkBefore && entry.type !== 'thinking') {
+      const thinkingEntry = {
+        type: 'thinking',
+        text: entry.thinkText || 'processing',
+        duration: entry.thinkDuration
+      };
+      return typeConsoleLine(stream, thinkingEntry, maxLines).then(() =>
+        typeConsoleLine(stream, entry, maxLines)
+      );
+    }
+    return typeConsoleLine(stream, entry, maxLines);
+  };
+
+  const initConsoleStreams = () => {
+    const streams = document.querySelectorAll('.console-stream');
+    if (!streams.length) return;
+    streams.forEach((stream, idx) => {
+      const maxLines = Number(stream.dataset.maxLines) || 9;
+      let pointerScript = idx % consoleScripts.length;
+      const playNext = () => {
+        const entry = consoleScripts[pointerScript];
+        pointerScript = (pointerScript + 1) % consoleScripts.length;
+        playConsoleEntry(stream, entry, maxLines).then(() => {
+          const pause = prefersReduced ? 200 : entry.pause ?? (entry.type === 'cmd' ? 260 : 520);
+          setTimeout(playNext, pause);
+        });
+      };
+      playNext();
+    });
+  };
+
+  initConsoleStreams();
 });
