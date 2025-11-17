@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XAN0</title>
+  <link rel="icon" href="logo.png" type="image/png">
+  <meta name="theme-color" content="#050505">
+  <meta name="color-scheme" content="dark">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script defer src="js/main.js"></script>
+</head>
+<body>
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
+  <div class="cursor-layer cursor-core" aria-hidden="true"></div>
+  <div class="cursor-layer cursor-ring" aria-hidden="true"></div>
+  <div class="cursor-layer cursor-glow" aria-hidden="true"></div>
+
+  <header class="site-chrome" data-depth="0.12">
+    <a href="#intro" class="logo wordmark">XAN0</a>
+    <nav id="nav" class="neo-nav" aria-label="Primary">
+      <button class="dock-toggle" aria-expanded="false" aria-label="Toggle navigation">
+        <span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a class="dock-link" href="#intro">Intro</a></li>
+        <li><a class="dock-link" href="#projects">Projects</a></li>
+        <li><a class="dock-link" href="#lab">Lab Notes</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section id="intro" class="hero reveal" aria-label="Hero">
+      <div class="hero-layers" aria-hidden="true" data-depth="-0.08">
+        <div class="layer ring"></div>
+        <div class="layer ring ring-small"></div>
+        <div class="layer grid"></div>
+      </div>
+      <div class="hero-inner">
+        <div class="hero-copy" data-tilt>
+          <p class="eyebrow">XanO</p>
+          <h1 class="hero-title">X0 Network</h1>
+          <p class="hero-body">X0 is an offspring of the developer Xan0. It's purpose is to test systems and applications against various attacks.</p>
+          <div class="hero-cta">
+            <a href="#projects" class="btn primary">See Projects</a>
+            <button class="btn ghost" data-scroll="#lab">Notes</button>
+          </div>
+        </div>
+        <div class="hero-sculpture" aria-hidden="true" data-depth="0.18">
+          <div class="pillar"></div>
+          <div class="pillar shadow"></div>
+          <div class="orbital"></div>
+          <div class="orbital small"></div>
+          <div class="mesh"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" class="projects reveal" aria-label="Projects">
+      <div class="section-head">
+        <p class="eyebrow">Latest Projects</p>
+        <h2>Project capsules</h2>
+        <p>Click on the tiles to see more.</p>
+      </div>
+      <div class="project-grid">
+        <article class="project-card tile" role="button" tabindex="0"
+                 data-title="Xan0 V1 - V10"
+                 data-description="An educational series exploring low-level system interaction and API hooking through Windows GDI. Conducted in a controlled environment for academic research."
+                 data-youtube="zlohrqK1rHs"
+                 data-tech="C#, WinAPI, pywin32, GDI">
+          <header>
+            <h3>Xan0</h3>
+          </header>
+          <p class="card-note">Deep instrumented routines for Windows graphics memory.</p>
+        </article>
+        <article class="project-card tile" role="button" tabindex="0"
+                 data-title="XCrypt"
+                 data-description="AES-256 encryption proof-of-concept focused on cryptographic rigor and behavior."
+                 data-youtube="w2u2ONjnmzg"
+                 data-tech="Python, Cryptography, File I/O">
+          <header>
+            <h3>XCrypt</h3>
+          </header>
+          <p class="card-note">A Ransomware</p>
+        </article>
+        <article class="project-card tile" role="button" tabindex="0"
+                 data-title="GhostByte"
+                 data-description="Asynchronous pressure testing of Discord API envelopes to study rate limits and automation behavior."
+                 data-youtube="jDVMjEndHm4"
+                 data-tech="Python, Discord.py, asyncio">
+          <header>
+            <h3>GhostByte</h3>
+          </header>
+          <p class="card-note">A fast discord nuke bot.</p>
+        </article>
+        <article class="project-card tile" role="button" tabindex="0"
+                 data-title="Streamz"
+                 data-description="Portable video streaming platform with Flask and SQLite."
+                 data-tech="Bootstrap, Flask, Sessions, SQLite, JavaScript"
+                 data-fallback="private">
+          <header>
+            <h3>Streamz</h3>
+          </header>
+          <p class="card-note">Video Streaming Website</p>
+        </article>
+        <article class="project-card tile" role="button" tabindex="0"
+                 data-title="XanaX"
+                 data-description="Discord-controlled RAT for research into command surfaces and defensive behaviors."
+                 data-tech="Python"
+                 data-fallback="private">
+          <header>
+            <h3>XanaX</h3>
+          </header>
+          <p class="card-note">Remote Access Trojan</p>
+        </article>
+        <article class="project-card ghost" aria-hidden="true">
+          <header>
+            <p>More soon</p>
+          </header>
+        </article>
+      </div>
+    </section>
+
+    <section id="lab" class="lab reveal" aria-label="Lab notes">
+      <div class="section-head">
+        <p class="eyebrow">Planned.</p>
+        <h2>Planned Projects</h2>
+        <p></p>
+      </div>
+      <div class="lab-panels">
+        <article class="lab-card">
+          <p class="label">Builder</p>
+          <h3>A simple UI Based Malware Builder</h3>
+          <p>#noskid <- will not be released publicly</p>
+        </article>
+        <article class="lab-card">
+          <p class="label">TracerX</p>
+          <h3>Official Community Discord Server.</h3>
+          <p>We will soon have our own discord server to connect and chill.</p>
+        </article>
+        <article class="lab-card">
+          <p class="label">Nebula Executor</p>
+          <h3>An beautifully animated LuaU Code Editor and Executor</h3>
+          <p>Designed to look good and work perfectly.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div id="projectModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button class="close-button" aria-label="Close">x</button>
+      <div class="modal-grid">
+        <div class="modal-video">
+          <div class="video-frame">
+            <iframe id="modalYoutube" title="Project video" src="" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="modal-details">
+          <h3 id="modalTitle"></h3>
+          <p id="modalDescription"></p>
+          <ul id="modalTech" class="tags"></ul>
+          <p id="modalFallback" class="modal-fallback" style="display:none">
+            <span id="modalFallbackText">Video unavailable.</span>
+            <a id="modalYoutubeLink" target="_blank" rel="noopener noreferrer">Open on YouTube</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+
+
+
+
