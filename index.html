@@ -1,185 +1,109 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>XAN0</title>
-  <link rel="icon" href="logo.png" type="image/png">
-  <meta name="theme-color" content="#050505">
-  <meta name="color-scheme" content="dark">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
-  <script defer src="js/main.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DESOLATION</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden; /* no scrollbars */
+      background: #000;
+      color: #fff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+        /* Smooth ambient background */
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: -20%;
+      pointer-events: none;
+    }
+
+    /* soft moving light fields */
+    body::before {
+      background:
+        radial-gradient(60% 60% at 30% 40%, rgba(255,255,255,0.035), transparent 70%),
+        radial-gradient(50% 50% at 70% 60%, rgba(255,255,255,0.025), transparent 75%),
+        radial-gradient(40% 40% at 50% 50%, rgba(255,255,255,0.02), transparent 80%);
+      filter: blur(40px);
+      animation: float 40s ease-in-out infinite;
+    }
+
+    /* ultra subtle grain layer */
+    body::after {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+      animation: grain 1.2s steps(2) infinite;
+    }
+
+    @keyframes float {
+      0%   { transform: translate(0%, 0%) scale(1); }
+      25%  { transform: translate(-4%, 3%) scale(1.03); }
+      50%  { transform: translate(3%, -4%) scale(1.05); }
+      75%  { transform: translate(-2%, -2%) scale(1.02); }
+      100% { transform: translate(0%, 0%) scale(1); }
+    }
+
+    @keyframes grain {
+      0% { transform: translate(0,0); }
+      25% { transform: translate(-1px,1px); }
+      50% { transform: translate(1px,-1px); }
+      75% { transform: translate(-1px,-1px); }
+      100% { transform: translate(0,0); }
+    }
+
+
+        /* Center text */
+    .center {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      z-index: 10; /* ensure above background layers */
+    }
+
+
+    .text {
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      line-height: 1.8;
+      opacity: 0;
+      animation: fadeIn 2.5s ease forwards;
+      white-space: nowrap;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 0.85; }
+    }
+
+    .muted {
+      opacity: 0.6;
+      letter-spacing: 0.15em;
+      font-size: 0.65rem;
+    }
+  </style>
 </head>
 <body>
-  <canvas id="bgCanvas" aria-hidden="true"></canvas>
-  <div class="cursor-layer cursor-core" aria-hidden="true"></div>
-  <div class="cursor-layer cursor-ring" aria-hidden="true"></div>
-  <div class="cursor-layer cursor-glow" aria-hidden="true"></div>
 
-  <header class="site-chrome" data-depth="0.12">
-    <a href="#intro" class="logo wordmark">XAN0</a>
-    <nav id="nav" class="neo-nav" aria-label="Primary">
-      <button class="dock-toggle" aria-expanded="false" aria-label="Toggle navigation">
-        
-      </button>
-      <ul class="nav-links">
-        <li><a class="dock-link" href="#intro">Intro</a></li>
-        <li><a class="dock-link" href="#projects">Projects</a></li>
-        <li><a class="dock-link" href="#lab">Lab Notes</a></li>
-      </ul>
-    </nav>
-  </header>
-
-  <main>
-    <section id="intro" class="hero reveal" aria-label="Hero">
-      <div class="hero-layers" aria-hidden="true" data-depth="-0.08">
-        <div class="layer ring"></div>
-        <div class="layer ring ring-small"></div>
-        <div class="layer grid"></div>
-      </div>
-      <div class="hero-inner">
-        <div class="hero-copy" data-tilt>
-          <p class="eyebrow">XanO</p>
-          <h1 class="hero-title">X0 Network</h1>
-          <p class="hero-body">X0 is an offspring of the developer Xan0. It's purpose is to test systems and applications against various attacks.</p>
-          <div class="hero-cta">
-            <a href="#projects" class="btn primary", style="text-decoration: none">See Projects</a>
-            <button class="btn ghost" data-scroll="#lab">Notes</button>
-          </div>
-        </div>
-        <div class="hero-sculpture" aria-hidden="true" data-depth="0.18">
-          <div class="pillar"></div>
-          <div class="pillar shadow"></div>
-          <div class="orbital"></div>
-          <div class="orbital small"></div>
-          <div class="mesh"></div>
-          <div class="console-flow" aria-hidden="true">
-            <div class="console-stream" data-max-lines="9"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="projects" class="projects reveal" aria-label="Projects">
-      <div class="section-head">
-        <p class="eyebrow">Latest Projects</p>
-        <h2>Project capsules</h2>
-        <p>Click on the tiles to see more.</p>
-      </div>
-      <div class="project-grid">
-        <article class="project-card tile" role="button" tabindex="0"
-                 data-title="Xan0 V1 - V10"
-                 data-description="An educational series exploring low-level system interaction and API hooking through Windows GDI. Conducted in a controlled environment for academic research."
-                 data-youtube="zlohrqK1rHs"
-                 data-tech="C#, WinAPI, pywin32, GDI">
-          <header>
-            <h3>Xan0</h3>
-          </header>
-          <p class="card-note">Deep instrumented routines for Windows graphics memory.</p>
-        </article>
-        <article class="project-card tile" role="button" tabindex="0"
-                 data-title="XCrypt"
-                 data-description="AES-256 encryption proof-of-concept focused on cryptographic rigor and behavior."
-                 data-youtube="w2u2ONjnmzg"
-                 data-tech="Python, Cryptography, File I/O">
-          <header>
-            <h3>XCrypt</h3>
-          </header>
-          <p class="card-note">A Ransomware</p>
-        </article>
-        <article class="project-card tile" role="button" tabindex="0"
-                 data-title="GhostByte"
-                 data-description="Asynchronous pressure testing of Discord API envelopes to study rate limits and automation behavior."
-                 data-youtube="jDVMjEndHm4"
-                 data-tech="Python, Discord.py, asyncio">
-          <header>
-            <h3>GhostByte</h3>
-          </header>
-          <p class="card-note">A fast discord nuke bot.</p>
-        </article>
-        <article class="project-card tile" role="button" tabindex="0"
-                 data-title="Streamz"
-                 data-description="Portable video streaming platform with Flask and SQLite."
-                 data-tech="Bootstrap, Flask, Sessions, SQLite, JavaScript"
-                 data-fallback="private">
-          <header>
-            <h3>Streamz</h3>
-          </header>
-          <p class="card-note">Video Streaming Website</p>
-        </article>
-        <article class="project-card tile" role="button" tabindex="0"
-                 data-title="XanaX"
-                 data-description="Discord-controlled RAT for research into command surfaces and defensive behaviors."
-                 data-tech="Python"
-                 data-fallback="private">
-          <header>
-            <h3>XanaX</h3>
-          </header>
-          <p class="card-note">Remote Access Trojan</p>
-        </article>
-        <article class="project-card tile" role="button" tabindex="0"
-                 data-title="X0"
-                 data-description="Our official discord server. https://discord.gg/xo-net"
-                 data-fallback="private">
-          <header>
-            <h3>X0</h3>
-          </header>
-          <p class="card-note">Official Community Discord Server</p>
-        </article>
-      </div>
-    </section>
-
-    <section id="lab" class="lab reveal" aria-label="Lab notes">
-      <div class="section-head">
-        <p class="eyebrow">Planned.</p>
-        <h2>Planned Projects</h2>
-        <p></p>
-      </div>
-      <div class="lab-panels">
-        <article class="lab-card">
-          <p class="label">Builder</p>
-          <h3>A simple UI Based Malware Builder</h3>
-          <p>#noskid <- will not be released publicly</p>
-        </article>
-        <article class="lab-card">
-          <p class="label">Nebula Executor</p>
-          <h3>An beautifully animated LuaU Code Editor and Executor</h3>
-          <p>Designed to look good and work perfectly.</p>
-        </article>
-      </div>
-    </section>
-  </main>
-
-  <div id="projectModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
-    <div class="modal-content">
-      <button class="close-button" aria-label="Close">x</button>
-      <div class="modal-grid">
-        <div class="modal-video">
-          <div class="video-frame">
-            <iframe id="modalYoutube" title="Project video" src="" frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowfullscreen></iframe>
-          </div>
-        </div>
-        <div class="modal-details">
-          <h3 id="modalTitle"></h3>
-          <p id="modalDescription"></p>
-          <ul id="modalTech" class="tags"></ul>
-          <p id="modalFallback" class="modal-fallback" style="display:none">
-            <span id="modalFallbackText">Video unavailable.</span>
-            <a id="modalYoutubeLink" target="_blank" rel="noopener noreferrer">Open on YouTube</a>
-          </p>
-        </div>
-      </div>
+  <div class="center">
+    <div class="text">
+      DESOLATION<br />
+      <span class="muted">alias Xan0</span><br />
+      <span class="muted">discord: xhi4</span>
     </div>
   </div>
+
 </body>
 </html>
-
-
-
-
-
